@@ -108,12 +108,25 @@ STEP 5: FIRST LAUNCH & IP SETUP
 1. Go to the "Actions" tab in GitHub.
 2. Select "Ultimate Minecraft Server" on the left.
 3. Click "Run workflow" -> Green Button.
-4. Wait ~2 minutes.
+4. Wait ~2-3 minutes for the Playit agent to start.
 
-ONCE IT IS RUNNING (First time only):
-1. Go to https://playit.gg/account/agents
-2. Click your Agent (it should be green/online).
-3. Click "Add Tunnel" -> Select "Minecraft Java".
-4. The address it gives you is your Server IP.
+------------------------------------------------------------
+STEP 6: SET UP PLAYIT TUNNELS (JAVA & BEDROCK)
+------------------------------------------------------------
+Once the server is running, you must expose it to the internet:
+1. Log into your Playit.gg Dashboard.
+2. Click "Agents" -> Click your glowing green GitHub Agent.
+
+FOR JAVA PLAYERS (PC/Mac):
+1. Click "Add Tunnel".
+2. Tunnel Type: "Minecraft Java"
+3. Verify: Local IP is 127.0.0.1, Port is 25565, Protocol is TCP.
+4. Click "Add". It will give you a domain (e.g., word.joinmc.link).
+
+FOR BEDROCK PLAYERS (Xbox/PS/Mobile/Win10):
+1. Click "Add Tunnel" again.
+2. Tunnel Type: "Minecraft Bedrock"
+3. Verify: Local IP is 127.0.0.1, Port is 19132, Protocol is UDP.
+4. Click "Add". It gives you an IP (e.g., word.ply.gg) and a 5-digit Port.
 
 ------------------------------------------------------------

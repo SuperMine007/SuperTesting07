@@ -132,7 +132,8 @@ jobs:
           PLAYIT_SECRET: ${{ secrets.PLAYIT_SECRET }}
         run: |
           playit --secret $PLAYIT_SECRET > playit_log.txt 2>&1 &
-          sleep 15
+          echo "Waiting for Playit to connect..."
+          sleep 20
 
       # 7b. Display Connection Info
       - name: ✨ Show Server IP
@@ -149,11 +150,13 @@ jobs:
 
       # 7c. Start Minecraft Server (UPDATED: Added Warnings)
       - name: 🟢 Start Server
+        env:
+          PLAYIT_SECRET: ${{ secrets.PLAYIT_SECRET }}
         run: |
           cd server
           
-          # 1. Start Server in Background
-          java -Xms6G -Xmx6G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1OldCSetRegionThresholdPercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar paper.jar nogui &
+          # 1. Start Server in Background (5GB RAM to prevent OOM crashes)
+          java -Xms5G -Xmx5G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1OldCSetRegionThresholdPercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar paper.jar nogui &
           SERVER_PID=$!
           
           # 2. Safety Timer Logic (With Warnings)
@@ -215,6 +218,12 @@ jobs:
                  kill -9 $SERVER_PID
               fi
               break
+            fi
+            # Auto-restart Playit if it crashed
+            if ! pgrep -x "playit" > /dev/null; then
+              echo "⚠️ Playit tunnel crashed! Restarting..."
+              playit --secret $PLAYIT_SECRET > ../playit_log.txt 2>&1 &
+              sleep 10
             fi
             sleep 10
           done

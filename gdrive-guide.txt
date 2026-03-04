@@ -1,0 +1,80 @@
+# How to Get Google Drive Rclone Config Using Termux (Android)
+
+This guide explains step-by-step how to generate the authentication key needed for your `GDRIVE_CONFIG` secret in GitHub Actions, doing everything entirely on your Android phone using Termux.
+
+---
+
+### Step 1: Install & Setup Termux
+1. Download **Termux** from the F-Droid store (the Google Play Store version is outdated and broken).
+2. Open Termux.
+3. Type the following command and press Enter to update packages (press `Y` or `Enter` if it asks you any questions during the process!):
+   ```bash
+   pkg update && pkg upgrade -y
+   ```
+
+### Step 2: Install Rclone
+Once the update finishes, you need to install the rclone software. Run this command:
+```bash
+pkg install rclone -y
+```
+
+### Step 3: Start the Configuration Process
+Now we will create the connection to Google. Run this command:
+```bash
+rclone config
+```
+
+You will now enter the rclone interactive menu. Follow these exact steps:
+1. Type `n` (for New remote) and press Enter.
+2. For "name>", type exactly **`gdrive`** (it must be lowercase!) and press Enter.
+3. A long list of cloud providers will appear. Look for the number next to **"Google Drive"** (usually it is number `18` or `19`, but check the list!). Type that number and press Enter.
+4. For `client_id>`, leave it **completely blank** and press Enter.
+5. For `client_secret>`, leave it **completely blank** and press Enter.
+6. For "scope>", type `1` (Full access) and press Enter.
+7. For `root_folder_id>`, leave it **completely blank** and press Enter.
+8. For `service_account_file>`, leave it **completely blank** and press Enter.
+9. For "Edit advanced config", type `n` (No) and press Enter.
+
+### Step 4: Connecting the Termux Browser
+This is the most important step where you actually log in to Google.
+1. It will ask: "Use auto config?" Type `y` (Yes) and press Enter.
+2. Termux will generate a link that looks like `http://127.0.0.1:53682/auth...` and will try to automatically open your phone's default browser (like Chrome). 
+   - *If your browser doesn't open automatically*, tap and hold the link in Termux to copy it, then manually open Chrome and paste it into the URL bar.
+3. In your browser, log into the Google Account where you want the Minecraft backups to be saved.
+4. Google will say "rclone wants to access your Google Account". Scroll down and tap **"Allow"** or "Continue".
+5. The browser should say "Success!" You can now close the browser and switch back to Termux.
+
+### Step 5: Finalizing the Setup in Termux
+1. Back in Termux, it will say "Configure this as a Shared Drive?". Type `n` (No) and press Enter.
+2. It will show you a summary of your configuration and ask "Is this OK?". Type `y` (Yes) and press Enter.
+3. You will be back at the main menu. Type `q` to quit the setup.
+
+---
+
+### Step 6: Finding and Copying the Secret Key
+Now that the connection is made, we just need to read the secret file that rclone created so you can copy and paste it into GitHub.
+
+1. Run this command to display your rclone configuration file text on the screen:
+   ```bash
+   cat ~/.config/rclone/rclone.conf
+   ```
+2. You will see a block of text that looks somewhat like this:
+   ```ini
+   [gdrive]
+   type = drive
+   scope = drive
+   token = {"access_token":"ya29.a0AWY7Ckl...","token_type":"Bearer","refresh_token":"1//0eXg...","expiry":"2026-03-04T12:00:00.000000Z"}
+   team_drive = 
+   ```
+3. **Copy ALL of that text EXACTLY as it appears!** Include `[gdrive]` all the way down to the end of the text. Do not miss a single bracket or parenthesis.
+4. Paste that entire block of text into your GitHub Repository as the secret named **`GDRIVE_CONFIG`**.
+
+---
+
+### Step 7: Manual Folder Setup in Google Drive
+Rclone is now connected, but it won't create the folder for you.
+1. Open the Google Drive app on your phone.
+2. In your main "My Drive", create a brand new folder.
+3. Name it exactly **`MinecraftServer`** (No spaces, capital M, capital S).
+
+You are completely finished! The GitHub workflow will now be able to read and write your backups flawlessly.

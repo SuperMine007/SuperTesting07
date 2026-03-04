@@ -1,0 +1,119 @@
+============================================================
+       ULTIMATE MINECRAFT SERVER SETUP GUIDE (2025)
+============================================================
+
+This guide sets up a free 24/7-style Minecraft server using 
+GitHub Actions. It includes Auto-Backups to Google Drive and 
+Discord integration.
+
+REQUREMENTS:
+1. GitHub Account
+2. Google Account (for backups)
+3. Discord Account (for controls)
+
+------------------------------------------------------------
+STEP 1: CREATE THE REPOSITORY
+------------------------------------------------------------
+1. Go to GitHub.com -> Click "+" -> "New repository".
+2. Name it: Minecraft-Server
+3. ⚠️ IMPORTANT: Set Visibility to "PUBLIC".
+   (Public repos get unlimited free Action minutes).
+4. Click "Create repository".
+
+------------------------------------------------------------
+STEP 2: ADD THE SCRIPT
+------------------------------------------------------------
+1. In your new repo, click "Add file" -> "Create new file".
+2. In the filename box, type exactly: .github/workflows/RDP.yml
+3. Paste the long server script code into the large text box.
+
+⚠️ IMPORTANT EDIT BEFORE SAVING:
+   Scroll down to the "Configure Plugins" section (Step 6).
+   Look for the numbers "1454377524..." and "14337503...".
+   Replace these with YOUR Discord Channel IDs:
+   - First number: Your Chat Channel ID.
+   - Second number: Your Console/Logs Channel ID.
+   (Enable "Developer Mode" in Discord Settings to right-click & copy IDs).
+
+4. Click "Commit changes" (Green button).
+
+------------------------------------------------------------
+STEP 3: HOW TO MAKE THE "PLUGINS" FOLDER
+------------------------------------------------------------
+GitHub does not allow empty folders, so you must use this trick:
+
+1. In your repo, click "Add file" -> "Create new file".
+2. In the filename box, type exactly: plugins/placeholder.txt
+   (Typing the slash "/" automatically creates the folder).
+3. In the text box, just type "Folder created" (or anything).
+4. Click "Commit changes".
+
+Now you have a "plugins" folder! You can click "Add file" -> "Upload files" 
+inside that folder to drag & drop your .jar files (like Geyser, ViaVersion).
+
+------------------------------------------------------------
+STEP 4: SET THE SECRETS (The Keys)
+------------------------------------------------------------
+Go to: Settings -> Secrets and variables -> Actions -> New repository secret.
+You need to add these 5 secrets:
+
+SECRET 1: PLAYIT_SECRET
+   (Connects your server to the internet)
+   1. Go to https://playit.gg -> Log in.
+   2. Dashboard -> Agents -> Create Agent -> "GitHub Server".(if you can't find key click dork button)
+   3. Copy the "Secret Key" (long random text).
+   4. Paste it into GitHub as "PLAYIT_SECRET".
+
+SECRET 2: DISCORD_TOKEN
+   (Allows the bot to chat)
+   1. Go to https://discord.com/developers/applications
+   2. Create App -> "Bot" tab -> Reset Token -> Copy Token.
+   3. Enable "Message Content Intent" (toggle it ON).
+   4. Paste the token into GitHub as "DISCORD_TOKEN".
+
+SECRET 3: GDRIVE_CONFIG
+   (Allows the server to save backups)
+   *Requires 'Termux' app on Android or rclone on PC*
+   
+   1. Install "Termux" from Play Store/F-Droid.
+   2. Open Termux and type: pkg install rclone -y
+   3. Type: rclone config
+   4. Type 'n' (New remote) -> Enter.
+   5. Type 'gdrive' (Name) -> Enter.
+   6. Look for "Google Drive" in the list (type the number) -> Enter.
+   7. Press Enter for Client ID (leave blank).
+   8. Press Enter for Client Secret (leave blank).
+   9. Type '1' (Full Access) -> Enter.
+   10. Press Enter for Root Folder ID (leave blank).
+   11. Press Enter for Service Account File (leave blank).
+   12. Type 'n' (No advanced config) -> Enter.
+   13. Type 'y' (Use web browser) -> Enter.
+   14. Log in to your Google Account and click "Allow".
+   15. Go back to Termux. Type 'n' (Not shared) -> Enter.
+   16. Type 'y' (Keep this remote) -> Enter.
+   17. Type 'q' (Quit) -> Enter.
+   18. Finally, type: cat ~/.config/rclone/rclone.conf
+   19. Copy ALL the text that appears (starting with [gdrive]...).
+   20. Paste that entire text block into GitHub as "GDRIVE_CONFIG".
+
+SECRET 4: SEED (Optional)
+   - Value: Any seed you want (e.g., -123456789).
+
+SECRET 5: END_PORTAL (Optional)
+   - Value: "true" or "false".
+
+------------------------------------------------------------
+STEP 5: FIRST LAUNCH & IP SETUP
+------------------------------------------------------------
+1. Go to the "Actions" tab in GitHub.
+2. Select "Ultimate Minecraft Server" on the left.
+3. Click "Run workflow" -> Green Button.
+4. Wait ~2 minutes.
+
+ONCE IT IS RUNNING (First time only):
+1. Go to https://playit.gg/account/agents
+2. Click your Agent (it should be green/online).
+3. Click "Add Tunnel" -> Select "Minecraft Java".
+4. The address it gives you is your Server IP.
+
+------------------------------------------------------------

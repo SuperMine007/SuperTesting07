@@ -219,11 +219,16 @@ jobs:
               fi
               break
             fi
-            # Auto-restart Playit if it crashed
-            if ! pgrep -x "playit" > /dev/null; then
-              echo "⚠️ Playit tunnel crashed! Restarting..."
-              playit --secret $PLAYIT_SECRET > ../playit_log.txt 2>&1 &
-              sleep 10
+            # Auto-restart Playit if it crashed (check every 60s)
+            PLAYIT_CHECK=$((ELAPSED % 60))
+            if [ "$PLAYIT_CHECK" -lt 11 ]; then
+              if ! pgrep -f "playit --secret" > /dev/null; then
+                echo "⚠️ Playit tunnel crashed! Restarting..."
+                pkill -f playit 2>/dev/null || true
+                sleep 2
+                playit --secret $PLAYIT_SECRET > ../playit_log.txt 2>&1 &
+                sleep 15
+              fi
             fi
             sleep 10
           done

@@ -148,7 +148,7 @@ jobs:
             echo ""
             exit 1
           else
-            nohup playit --secret $PLAYIT_SECRET > playit_log.txt 2>&1 &
+            nohup playit --secret $PLAYIT_SECRET < /dev/null > playit_log.txt 2>&1 &
             PLAYIT_PID=$!
             echo "Playit PID: $PLAYIT_PID"
             sleep 15
@@ -239,14 +239,12 @@ jobs:
             PLAYIT_CHECK=$((ELAPSED % 60))
             if [ "$PLAYIT_CHECK" -lt 11 ]; then
               if ! kill -0 $PLAYIT_PID 2>/dev/null; then
-                echo "⚠️ Playit tunnel crashed! Here is the error log:"
-                cat $GITHUB_WORKSPACE/playit_log.txt || echo "No log found."
-                echo "Restarting Playit..."
+                echo "⚠️ Playit tunnel crashed! Restarting..."
                 if [ -z "$PLAYIT_SECRET" ]; then
                    unset PLAYIT_SECRET
-                   nohup playit > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &
+                   nohup playit < /dev/null > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &
                 else
-                   nohup playit --secret $PLAYIT_SECRET > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &
+                   nohup playit --secret $PLAYIT_SECRET < /dev/null > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &
                 fi
                 PLAYIT_PID=$!
                 sleep 15

@@ -135,32 +135,44 @@ jobs:
           echo "Starting Playit tunnel..."
           if [ -z "$PLAYIT_SECRET" ]; then
             unset PLAYIT_SECRET
-            echo ""
-            echo "=========================================="
-            echo "⚠️ NO PLAYIT_SECRET FOUND!"
-            echo "⚠️ Running Playit now to generate a claim link."
-            echo "⚠️ The link will appear DIRECTLY BELOW in the next 20 seconds."
-            echo "⚠️ Copy the https://playit.gg/claim/... link and open it in your browser!"
-            echo "=========================================="
-            echo ""
+            echo "⚠️ NO PLAYIT_SECRET FOUND! Generating a new claim link..."
+            sudo apt-get update >/dev/null && sudo apt-get install -y expect >/dev/null
             
-            # Run playit in FOREGROUND for 20 seconds
-            # Output goes DIRECTLY to GitHub Actions console - no file, no pipe, no buffering
-            timeout 20 playit || true
-            
-            echo ""
-            echo "=========================================="
-            echo "⚠️ If you saw a claim link above, open it in your browser NOW."
-            echo "⚠️ After claiming, go to Playit Dashboard > Agents > click the agent"
-            echo "⚠️ Copy the secret from: docker run ... -e SECRET=YOUR_SECRET_HERE"
-            echo "⚠️ Then add it as PLAYIT_SECRET in GitHub Secrets and re-run this workflow."
-            echo "=========================================="
-            echo ""
-            
-            # Now restart playit in background (it auto-saved its config to a file)
-            playit > playit_log.txt 2>&1 &
+            echo "Running playit to fetch claim link..."
+            unbuffer playit > playit_log.txt 2>&1 &
             PLAYIT_PID=$!
-            sleep 5
+            
+            CLAIM_LINK=""
+            echo "Waiting up to 30 seconds for the link..."
+            for i in {1..15}; do
+              sleep 2
+              CLAIM_LINK=$(grep -oE "https://playit.gg/claim/[a-zA-Z0-9]+" playit_log.txt | head -n 1)
+              if [ -n "$CLAIM_LINK" ]; then
+                break
+              fi
+            done
+            
+            if [ -z "$CLAIM_LINK" ]; then
+              echo "❌ Failed to generate claim link! Full log:"
+              cat playit_log.txt
+            else
+              echo ""
+              echo "================================================================="
+              echo "🚨 ACTION REQUIRED: CLAIM YOUR PLAYIT.GG AGENT 🚨"
+              echo "================================================================="
+              echo "1. Click this link RIGHT NOW: 👉 $CLAIM_LINK 👈"
+              echo "2. After it says 'Agent Claimed', go to Playit Dashboard -> Agents"
+              echo "3. Click your new agent, and find its Secret Key"
+              echo "4. Add that Secret to your GitHub Repository Secrets as PLAYIT_SECRET"
+              echo "5. Cancel this workflow and run it again!"
+              echo "================================================================="
+              echo "⏳ I will keep this agent alive for 5 minutes so you can claim it."
+              echo "⏳ Waiting 300 seconds..."
+              sleep 300
+              echo "⚠️ Time's up! Shutting down."
+            fi
+            
+            exit 1 # Fail workflow so it doesn't proceed without a secret
           else
             nohup playit --secret $PLAYIT_SECRET > playit_log.txt 2>&1 &
             PLAYIT_PID=$!

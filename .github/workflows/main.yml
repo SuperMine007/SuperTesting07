@@ -239,7 +239,9 @@ jobs:
             PLAYIT_CHECK=$((ELAPSED % 60))
             if [ "$PLAYIT_CHECK" -lt 11 ]; then
               if ! kill -0 $PLAYIT_PID 2>/dev/null; then
-                echo "⚠️ Playit tunnel crashed! Restarting..."
+                echo "⚠️ Playit tunnel crashed! Here is the error log:"
+                cat $GITHUB_WORKSPACE/playit_log.txt || echo "No log found."
+                echo "Restarting Playit..."
                 if [ -z "$PLAYIT_SECRET" ]; then
                    unset PLAYIT_SECRET
                    nohup playit < /dev/null > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &

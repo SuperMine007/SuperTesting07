@@ -135,7 +135,8 @@ jobs:
           echo "Starting Playit tunnel..."
           if [ -z "$PLAYIT_SECRET" ]; then
             echo "⚠️ NO PLAYIT_SECRET FOUND! Generating a new claim link..."
-            echo "⚠️ Look below for the claim link: https://playit.gg/claim/..."
+            echo "⚠️ Look at the VERY BOTTOM of this log block for the REAL claim link!"
+            unset PLAYIT_SECRET
             nohup playit > playit_log.txt 2>&1 &
             PLAYIT_PID=$!
             sleep 15
@@ -234,6 +235,7 @@ jobs:
               if ! kill -0 $PLAYIT_PID 2>/dev/null; then
                 echo "⚠️ Playit tunnel crashed! Restarting..."
                 if [ -z "$PLAYIT_SECRET" ]; then
+                   unset PLAYIT_SECRET
                    nohup playit > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &
                 else
                    nohup playit --secret $PLAYIT_SECRET > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &

@@ -136,25 +136,27 @@ jobs:
           if [ -z "$PLAYIT_SECRET" ]; then
             unset PLAYIT_SECRET
             echo "⚠️ NO PLAYIT_SECRET FOUND! Generating a new claim link..."
-            sudo apt-get update >/dev/null && sudo apt-get install -y expect >/dev/null
             
-            echo "Running playit to fetch claim link..."
-            unbuffer playit > playit_log.txt 2>&1 &
+            # Use Python's built-in PTY module to perfectly spoof a terminal
+            # This prevents Playit from garbling output or hiding the link in CI
+            echo "Running playit via Python PTY..."
+            python3 -c "import pty; pty.spawn(['playit'])" > playit_log.txt 2>&1 &
             PLAYIT_PID=$!
             
             CLAIM_LINK=""
             echo "Waiting up to 30 seconds for the link..."
             for i in {1..15}; do
               sleep 2
-              CLAIM_LINK=$(grep -oE "https://playit.gg/claim/[a-zA-Z0-9]+" playit_log.txt | head -n 1)
+              # Strip ANSI color codes and find the link
+              CLAIM_LINK=$(sed -r 's/\x1B\[[0-9;]*[mK]//g' playit_log.txt | grep -oE "https://playit.gg/claim/[a-zA-Z0-9]+" | head -n 1)
               if [ -n "$CLAIM_LINK" ]; then
                 break
               fi
             done
             
             if [ -z "$CLAIM_LINK" ]; then
-              echo "❌ Failed to generate claim link! Full log:"
-              cat playit_log.txt
+              echo "❌ Failed to generate claim link! Full log (cleaned):"
+              sed -r 's/\x1B\[[0-9;]*[mK]//g' playit_log.txt || true
             else
               echo ""
               echo "================================================================="
@@ -172,6 +174,7 @@ jobs:
               echo "⚠️ Time's up! Shutting down."
             fi
             
+            pkill -P $PLAYIT_PID || true
             exit 1 # Fail workflow so it doesn't proceed without a secret
           else
             nohup playit --secret $PLAYIT_SECRET > playit_log.txt 2>&1 &

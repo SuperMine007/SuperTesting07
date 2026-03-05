@@ -135,12 +135,17 @@ jobs:
           echo "Starting Playit tunnel..."
           if [ -z "$PLAYIT_SECRET" ]; then
             echo "⚠️ NO PLAYIT_SECRET FOUND! Generating a new claim link..."
-            echo "⚠️ Look at the VERY BOTTOM of this log block for the REAL claim link!"
+            echo "⚠️ Look below for the REAL claim link:"
             unset PLAYIT_SECRET
-            nohup playit > playit_log.txt 2>&1 &
+            
+            # Run without nohup initially to force it to print the link to console
+            playit > playit_log.txt 2>&1 &
             PLAYIT_PID=$!
             sleep 15
-            cat playit_log.txt
+            
+            echo "--- PLAYIT CLAIM LINK ---"
+            cat playit_log.txt | grep -Eo "https://playit.gg/claim/[a-zA-Z0-9]+" || cat playit_log.txt
+            echo "-------------------------"
           else
             nohup playit --secret $PLAYIT_SECRET > playit_log.txt 2>&1 &
             PLAYIT_PID=$!

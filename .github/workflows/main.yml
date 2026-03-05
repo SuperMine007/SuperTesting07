@@ -133,10 +133,19 @@ jobs:
         run: |
           # 1. Start Playit INSIDE this step so it doesn't get killed
           echo "Starting Playit tunnel..."
-          nohup playit --secret $PLAYIT_SECRET > playit_log.txt 2>&1 &
-          PLAYIT_PID=$!
-          echo "Playit PID: $PLAYIT_PID"
-          sleep 20
+          if [ -z "$PLAYIT_SECRET" ]; then
+            echo "⚠️ NO PLAYIT_SECRET FOUND! Generating a new claim link..."
+            echo "⚠️ Look below for the claim link: https://playit.gg/claim/..."
+            nohup playit > playit_log.txt 2>&1 &
+            PLAYIT_PID=$!
+            sleep 15
+            cat playit_log.txt
+          else
+            nohup playit --secret $PLAYIT_SECRET > playit_log.txt 2>&1 &
+            PLAYIT_PID=$!
+            echo "Playit PID: $PLAYIT_PID"
+            sleep 15
+          fi
           
           # 2. Show Connection Info
           echo "------------------------------------------"
@@ -145,7 +154,11 @@ jobs:
           JAVA_IP=$(grep -oE '[a-zA-Z0-9.-]+\.joinmc\.link' playit_log.txt | head -n 1)
           echo "🖥️ JAVA IP: ${JAVA_IP:-Check playit.gg dashboard}"
           BEDROCK_INFO=$(grep -oE '[a-zA-Z0-9.-]+\.ply\.gg:[0-9]+' playit_log.txt | head -n 1)
-          echo "📱 BEDROCK: ${BEDROCK_INFO:-Check playit.gg dashboard}"
+          if [ -z "$JAVA_IP" ] && [ -z "$PLAYIT_SECRET" ]; then
+             echo "⚠️ SERVER HAS NO IP! YOU MUST CLICK THE CLAIM LINK ABOVE ⚠️"
+          else
+             echo "📱 BEDROCK: ${BEDROCK_INFO:-Check playit.gg dashboard}"
+          fi
           echo "------------------------------------------"
           echo "🎮 Logs below are only from Minecraft..."
           
@@ -220,7 +233,11 @@ jobs:
             if [ "$PLAYIT_CHECK" -lt 11 ]; then
               if ! kill -0 $PLAYIT_PID 2>/dev/null; then
                 echo "⚠️ Playit tunnel crashed! Restarting..."
-                nohup playit --secret $PLAYIT_SECRET > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &
+                if [ -z "$PLAYIT_SECRET" ]; then
+                   nohup playit > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &
+                else
+                   nohup playit --secret $PLAYIT_SECRET > $GITHUB_WORKSPACE/playit_log.txt 2>&1 &
+                fi
                 PLAYIT_PID=$!
                 sleep 15
               fi

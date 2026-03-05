@@ -134,39 +134,33 @@ jobs:
           # 1. Start Playit INSIDE this step so it doesn't get killed
           echo "Starting Playit tunnel..."
           if [ -z "$PLAYIT_SECRET" ]; then
-            echo "⚠️ NO PLAYIT_SECRET FOUND! Generating a new claim link..."
             unset PLAYIT_SECRET
+            echo ""
+            echo "=========================================="
+            echo "⚠️ NO PLAYIT_SECRET FOUND!"
+            echo "⚠️ Running Playit now to generate a claim link."
+            echo "⚠️ The link will appear DIRECTLY BELOW in the next 20 seconds."
+            echo "⚠️ Copy the https://playit.gg/claim/... link and open it in your browser!"
+            echo "=========================================="
+            echo ""
             
-            # Check if playit is even installed
-            which playit && echo "✅ Playit binary found" || echo "❌ Playit NOT found!"
-            playit --version 2>&1 || echo "Could not get playit version"
+            # Run playit in FOREGROUND for 20 seconds
+            # Output goes DIRECTLY to GitHub Actions console - no file, no pipe, no buffering
+            timeout 20 playit || true
             
-            # Use 'script' to fake a TTY so playit generates the claim link
-            script -qc "playit" playit_log.txt &
+            echo ""
+            echo "=========================================="
+            echo "⚠️ If you saw a claim link above, open it in your browser NOW."
+            echo "⚠️ After claiming, go to Playit Dashboard > Agents > click the agent"
+            echo "⚠️ Copy the secret from: docker run ... -e SECRET=YOUR_SECRET_HERE"
+            echo "⚠️ Then add it as PLAYIT_SECRET in GitHub Secrets and re-run this workflow."
+            echo "=========================================="
+            echo ""
+            
+            # Now restart playit in background (it auto-saved its config to a file)
+            playit > playit_log.txt 2>&1 &
             PLAYIT_PID=$!
-            
-            # Poll for the claim link (up to 30 seconds)
-            echo "Waiting for Playit to generate claim link..."
-            for i in $(seq 1 6); do
-              sleep 5
-              CLAIM_LINK=$(grep -oE "https://playit.gg/claim/[a-zA-Z0-9]+" playit_log.txt 2>/dev/null || true)
-              if [ -n "$CLAIM_LINK" ]; then
-                echo ""
-                echo "=========================================="
-                echo "🔗 CLAIM YOUR AGENT HERE:"
-                echo "$CLAIM_LINK"
-                echo "=========================================="
-                echo ""
-                break
-              fi
-              echo "  ...still waiting ($((i*5))s)..."
-            done
-            
-            # If still no link, dump the full log for debugging
-            if [ -z "$CLAIM_LINK" ]; then
-              echo "❌ Could not find claim link. Full Playit output:"
-              cat playit_log.txt 2>/dev/null || echo "(log file empty)"
-            fi
+            sleep 5
           else
             nohup playit --secret $PLAYIT_SECRET > playit_log.txt 2>&1 &
             PLAYIT_PID=$!

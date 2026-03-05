@@ -135,17 +135,38 @@ jobs:
           echo "Starting Playit tunnel..."
           if [ -z "$PLAYIT_SECRET" ]; then
             echo "⚠️ NO PLAYIT_SECRET FOUND! Generating a new claim link..."
-            echo "⚠️ Look below for the REAL claim link:"
             unset PLAYIT_SECRET
             
-            # Run without nohup initially to force it to print the link to console
-            playit > playit_log.txt 2>&1 &
-            PLAYIT_PID=$!
-            sleep 15
+            # Check if playit is even installed
+            which playit && echo "✅ Playit binary found" || echo "❌ Playit NOT found!"
+            playit --version 2>&1 || echo "Could not get playit version"
             
-            echo "--- PLAYIT CLAIM LINK ---"
-            cat playit_log.txt | grep -Eo "https://playit.gg/claim/[a-zA-Z0-9]+" || cat playit_log.txt
-            echo "-------------------------"
+            # Use 'script' to fake a TTY so playit generates the claim link
+            script -qc "playit" playit_log.txt &
+            PLAYIT_PID=$!
+            
+            # Poll for the claim link (up to 30 seconds)
+            echo "Waiting for Playit to generate claim link..."
+            for i in $(seq 1 6); do
+              sleep 5
+              CLAIM_LINK=$(grep -oE "https://playit.gg/claim/[a-zA-Z0-9]+" playit_log.txt 2>/dev/null || true)
+              if [ -n "$CLAIM_LINK" ]; then
+                echo ""
+                echo "=========================================="
+                echo "🔗 CLAIM YOUR AGENT HERE:"
+                echo "$CLAIM_LINK"
+                echo "=========================================="
+                echo ""
+                break
+              fi
+              echo "  ...still waiting ($((i*5))s)..."
+            done
+            
+            # If still no link, dump the full log for debugging
+            if [ -z "$CLAIM_LINK" ]; then
+              echo "❌ Could not find claim link. Full Playit output:"
+              cat playit_log.txt 2>/dev/null || echo "(log file empty)"
+            fi
           else
             nohup playit --secret $PLAYIT_SECRET > playit_log.txt 2>&1 &
             PLAYIT_PID=$!

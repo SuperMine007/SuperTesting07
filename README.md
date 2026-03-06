@@ -36,24 +36,34 @@ When you click "Run", GitHub gives your server a temporary virtual machine with 
 
 ---
 
-## 🚀 Setup Guide (For Absolute Beginners)
+## 🚀 Setup Guide (Choose a Method)
 
-Follow these steps exactly to set up your own server in 10 minutes.
+There are two ways to set up the server. The "Fork" method takes less than 60 seconds and is highly recommended!
 
-### Step 1: Create the Repository
+### Method 1: Forking (Highly Recommended & Easiest)
+1. At the very top right of this repository page, click the **Fork** button.
+2. Uncheck "Copy the `main` branch only" (optional, but good practice).
+3. Click the green **Create fork** button.
+4. You now have an exact copy of the entire server in your own account! You do *not* need to make any files manually.
+5. Skip directly to the **🔑 Secret Keys** section below to connect your accounts.
+
+### Method 2: Manual Setup (From Scratch)
+*If you don't want to fork, you can build it manually:*
+
+#### Step 1: Create the Repository
 1. Go to your GitHub Homepage.
 2. Click the `+` icon in the top right -> `New repository`.
 3. Name it whatever you like (e.g., `SuperSMP-Server`).
 4. ⚠️ **CRITICAL:** Set Visibility to **"PUBLIC"**. If it is Private, your Action minutes are limited to 2,000 per month. Public repositories get *unlimited* free minutes!
 5. Click `Create repository`.
 
-### Step 2: Install the Script
+#### Step 2: Install the Script
 1. Inside your new repository, click `Add file` -> `Create new file`.
 2. In the filename box at the top, type exactly: **`.github/workflows/main.yml`**
 3. Paste the provided workflow code into the large text box.
 4. Click the green `Commit changes` button.
 
-### Step 3: Prepare the "Plugins" Folder
+#### Step 3: Prepare the "Plugins" Folder
 GitHub does not allow empty folders. We need to create a placeholder so we can upload plugins later!
 1. Go back to your repo homepage.
 2. Click `Add file` -> `Create new file`.
@@ -74,9 +84,12 @@ You need to add these secret keys:
 
 ### 1. PLAYIT_SECRET (Connects players to the server)
 1. Go to [Playit.gg](https://playit.gg) & log in.
-2. Go to **Dashboard -> Agents -> Add Agent** (or create a new GitHub Server agent).
-3. Copy the long random "Secret Key".
-4. Add it as a repository secret named `PLAYIT_SECRET`.
+2. Go to **Dashboard -> Accounts -> New Account Wizard**.
+3. Select **Docker** as the method.
+4. Name your agent (e.g., "GitHub Server") and confirm.
+5. Copy the long random "Secret Key" it gives you directly from the setup screen.
+6. Add it as a repository secret named `PLAYIT_SECRET` in your GitHub Settings.
+7. *Important:* The Playit agent won't actually "finish" creation on their website until you click 'Run workflow' on GitHub for the first time! When you run the server, it will connect and finish the wizard automatically.
 
 ### 2. DISCORD_TOKEN (For server chat and console logs)
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).

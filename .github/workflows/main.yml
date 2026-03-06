@@ -256,7 +256,7 @@ jobs:
             fi
             # --- Custom Commands: Check server logs ---
             if [ -f logs/latest.log ] && [ ! -f $GITHUB_WORKSPACE/SHUTDOWN_HANDLED ]; then
-              LAST_LINE=$(tail -1 logs/latest.log)
+              LAST_LINE=$(tail -5 logs/latest.log)
               # Debug: show last log line every check cycle
               # Check for shutdown command (but NOT the word inside "downloadworld")
               if echo "$LAST_LINE" | grep -qi "shutdown"; then

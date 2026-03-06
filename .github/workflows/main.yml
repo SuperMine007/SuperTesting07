@@ -256,19 +256,23 @@ jobs:
             fi
             # --- Custom Commands: Check server logs ---
             if [ -f logs/latest.log ] && [ ! -f $GITHUB_WORKSPACE/SHUTDOWN_HANDLED ]; then
-              LAST_LOG=$(tail -10 logs/latest.log)
-              # Matches: [Server] shutdown | issued command: /shutdown | or just the word on its own line
-              if echo "$LAST_LOG" | grep -qiE '(\[Server\].*shutdown|command.*shutdown|^.*shutdown\s*$)'; then
-                if [ ! -f $GITHUB_WORKSPACE/NO_RESTART ]; then
-                  echo "🛑 SHUTDOWN command detected! Stopping without restart..."
-                  touch $GITHUB_WORKSPACE/NO_RESTART
-                  touch $GITHUB_WORKSPACE/SHUTDOWN_HANDLED
-                  echo "say 🛑 Server is shutting down. Ask an admin to turn it back on!" > /proc/$SERVER_PID/fd/0
-                  sleep 2
-                  echo "stop" > /proc/$SERVER_PID/fd/0
+              LAST_LINE=$(tail -1 logs/latest.log)
+              # Debug: show last log line every check cycle
+              # Check for shutdown command (but NOT the word inside "downloadworld")
+              if echo "$LAST_LINE" | grep -qi "shutdown"; then
+                if ! echo "$LAST_LINE" | grep -qi "downloadworld"; then
+                  if [ ! -f $GITHUB_WORKSPACE/NO_RESTART ]; then
+                    echo "🛑 SHUTDOWN command detected! Stopping without restart..."
+                    touch $GITHUB_WORKSPACE/NO_RESTART
+                    touch $GITHUB_WORKSPACE/SHUTDOWN_HANDLED
+                    echo "say 🛑 Server is shutting down. Ask an admin to turn it back on!" > /proc/$SERVER_PID/fd/0
+                    sleep 2
+                    echo "stop" > /proc/$SERVER_PID/fd/0
+                  fi
                 fi
               fi
-              if echo "$LAST_LOG" | grep -qiE '(\[Server\].*downloadworld|command.*downloadworld|^.*downloadworld\s*$)'; then
+              # Check for downloadworld command
+              if echo "$LAST_LINE" | grep -qi "downloadworld"; then
                 if [ ! -f $GITHUB_WORKSPACE/DOWNLOAD_WORLD ]; then
                   echo "📥 DOWNLOADWORLD command detected! Stopping to generate download link..."
                   touch $GITHUB_WORKSPACE/DOWNLOAD_WORLD

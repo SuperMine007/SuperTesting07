@@ -260,7 +260,7 @@ jobs:
               if echo "$LAST_LOG" | grep -qi "shutdown"; then
                 echo "🛑 SHUTDOWN command detected! Stopping without restart..."
                 touch $GITHUB_WORKSPACE/NO_RESTART
-                echo "say 🛑 Server is shutting down permanently (no restart)..." > /proc/$SERVER_PID/fd/0
+                echo "say 🛑 Server is shutting down. Ask an admin to turn it back on!" > /proc/$SERVER_PID/fd/0
                 sleep 2
                 echo "stop" > /proc/$SERVER_PID/fd/0
               fi

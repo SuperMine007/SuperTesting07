@@ -173,8 +173,33 @@ jobs:
           
           cd server
           
-          # 3. Start Minecraft Server (6GB RAM for best performance)
-          java -Xms6G -Xmx6G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1OldCSetRegionThresholdPercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar paper.jar nogui &
+          # 2.5 Setup Live Command Listener (Named Pipe)
+          mkfifo server_output
+          while read -r line; do
+            if echo "$line" | grep -Fqi "[Server] shutdown"; then
+              if [ ! -f $GITHUB_WORKSPACE/SHUTDOWN_HANDLED ]; then
+                echo "🛑 SHUTDOWN command detected! Stopping safely..."
+                touch $GITHUB_WORKSPACE/NO_RESTART
+                touch $GITHUB_WORKSPACE/SHUTDOWN_HANDLED
+                echo "say 🛑 Server is shutting down. Ask an admin to turn it back on!" > /proc/$SERVER_PID/fd/0
+                sleep 2
+                echo "stop" > /proc/$SERVER_PID/fd/0
+              fi
+            elif echo "$line" | grep -Fqi "[Server] downloadworld"; then
+              if [ ! -f $GITHUB_WORKSPACE/SHUTDOWN_HANDLED ]; then
+                echo "📥 DOWNLOADWORLD command detected! Stopping safely..."
+                touch $GITHUB_WORKSPACE/DOWNLOAD_WORLD
+                touch $GITHUB_WORKSPACE/SHUTDOWN_HANDLED
+                echo "say 📥 Server is stopping to generate a world download link. It will restart after!" > /proc/$SERVER_PID/fd/0
+                sleep 2
+                echo "stop" > /proc/$SERVER_PID/fd/0
+              fi
+            fi
+          done < server_output &
+          LISTENER_PID=$!
+          
+          # 3. Start Minecraft Server (Pipe output to listener)
+          java -Xms6G -Xmx6G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1OldCSetRegionThresholdPercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true -jar paper.jar nogui | tee server_output &
           SERVER_PID=$!
           
           # 2. Safety Timer Logic (With Warnings)
@@ -252,35 +277,6 @@ jobs:
                 fi
                 PLAYIT_PID=$!
                 sleep 20
-              fi
-            fi
-            # --- Custom Commands: Check server logs ---
-            if [ -f logs/latest.log ] && [ ! -f $GITHUB_WORKSPACE/SHUTDOWN_HANDLED ]; then
-              LAST_LINE=$(tail -5 logs/latest.log)
-              # Debug: show last log line every check cycle
-              # Check for shutdown command (but NOT the word inside "downloadworld")
-              if echo "$LAST_LINE" | grep -qi "shutdown"; then
-                if ! echo "$LAST_LINE" | grep -qi "downloadworld"; then
-                  if [ ! -f $GITHUB_WORKSPACE/NO_RESTART ]; then
-                    echo "🛑 SHUTDOWN command detected! Stopping without restart..."
-                    touch $GITHUB_WORKSPACE/NO_RESTART
-                    touch $GITHUB_WORKSPACE/SHUTDOWN_HANDLED
-                    echo "say 🛑 Server is shutting down. Ask an admin to turn it back on!" > /proc/$SERVER_PID/fd/0
-                    sleep 2
-                    echo "stop" > /proc/$SERVER_PID/fd/0
-                  fi
-                fi
-              fi
-              # Check for downloadworld command
-              if echo "$LAST_LINE" | grep -qi "downloadworld"; then
-                if [ ! -f $GITHUB_WORKSPACE/DOWNLOAD_WORLD ]; then
-                  echo "📥 DOWNLOADWORLD command detected! Stopping to generate download link..."
-                  touch $GITHUB_WORKSPACE/DOWNLOAD_WORLD
-                  touch $GITHUB_WORKSPACE/SHUTDOWN_HANDLED
-                  echo "say 📥 Server is stopping to generate a world download link. It will restart after!" > /proc/$SERVER_PID/fd/0
-                  sleep 2
-                  echo "stop" > /proc/$SERVER_PID/fd/0
-                fi
               fi
             fi
             sleep 10

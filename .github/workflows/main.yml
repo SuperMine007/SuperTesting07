@@ -115,7 +115,7 @@ jobs:
           if ls server/plugins/DiscordSRV*.jar 1> /dev/null 2>&1; then
             mkdir -p server/plugins/DiscordSRV
             echo "BotToken: \"$DISCORD_TOKEN\"" > server/plugins/DiscordSRV/config.yml
-            echo "Channels: {\"global\": \"1454377524250284096\"}" >> server/plugins/DiscordSRV/config.yml
+            echo "Channels: {\"global\": \"1479509091155054712\"}" >> server/plugins/DiscordSRV/config.yml
             echo "DiscordConsoleChannelId: \"1433750303089623120\"" >> server/plugins/DiscordSRV/config.yml
             echo "DiscordConsoleChannelLevels: [info]" >> server/plugins/DiscordSRV/config.yml
             echo "ConfigVersion: 1.26.0" >> server/plugins/DiscordSRV/config.yml

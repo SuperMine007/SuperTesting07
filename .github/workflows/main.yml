@@ -116,7 +116,7 @@ jobs:
             echo "BotToken: \"$DISCORD_TOKEN\"" > server/plugins/DiscordSRV/config.yml
             echo "Channels: {\"global\": \"1454377524250284096\"}" >> server/plugins/DiscordSRV/config.yml
             echo "DiscordConsoleChannelId: \"1433750303089623120\"" >> server/plugins/DiscordSRV/config.yml
-            echo "DiscordConsoleChannelLevels: [all]" >> server/plugins/DiscordSRV/config.yml
+            echo "DiscordConsoleChannelLevels: [info]" >> server/plugins/DiscordSRV/config.yml
             echo "ConfigVersion: 1.26.0" >> server/plugins/DiscordSRV/config.yml
             echo "Experiment_JdbcAccountLinkBackend: true" >> server/plugins/DiscordSRV/config.yml
           fi
@@ -215,28 +215,6 @@ jobs:
                 echo "say 👋 Server is closing now!" > /proc/$SERVER_PID/fd/0
             fi
 
-            # --- Custom Commands: Check server logs synchronously ---
-            if [ -f logs/latest.log ] && [ ! -f $GITHUB_WORKSPACE/SHUTDOWN_HANDLED ]; then
-              # Scan the last 100 lines to ensure we don't miss commands buried by plugin chatter
-              LOG_CHUNK=$(tail -n 100 logs/latest.log)
-              
-              if echo "$LOG_CHUNK" | grep -Fqi "[Server] shutdown"; then
-                 echo "🛑 SHUTDOWN command detected! Stopping safely..."
-                 touch $GITHUB_WORKSPACE/NO_RESTART
-                 touch $GITHUB_WORKSPACE/SHUTDOWN_HANDLED
-                 echo "say 🛑 Server is shutting down. Ask an admin to turn it back on!" > /proc/$SERVER_PID/fd/0
-                 sleep 2
-                 echo "stop" > /proc/$SERVER_PID/fd/0
-              elif echo "$LOG_CHUNK" | grep -Fqi "[Server] downloadworld"; then
-                 echo "📥 DOWNLOADWORLD command detected! Stopping safely..."
-                 touch $GITHUB_WORKSPACE/DOWNLOAD_WORLD
-                 touch $GITHUB_WORKSPACE/SHUTDOWN_HANDLED
-                 echo "say 📥 Server is stopping to generate a world download link. It will restart after!" > /proc/$SERVER_PID/fd/0
-                 sleep 2
-                 echo "stop" > /proc/$SERVER_PID/fd/0
-              fi
-            fi
-
             # If timer runs out (5.5 hours)
             if [ $ELAPSED -ge $MAX_DURATION ]; then
               echo "⏰ Time limit reached (5.5h). Initiating shutdown..."
@@ -292,33 +270,12 @@ jobs:
           rclone copy backup.zip gdrive:MinecraftServer/
           echo "✅ Backup Complete!"
 
-      # 8.5. Generate World Download Link (only when downloadworld was used)
-      - name: 📥 Generate World Download Link
-        if: always()
-        run: |
-          if [ -f DOWNLOAD_WORLD ]; then
-            echo "Generating public download link..."
-            LINK=$(rclone link gdrive:MinecraftServer/backup.zip 2>&1) || true
-            echo ""
-            echo "================================================="
-            echo "📥 WORLD DOWNLOAD LINK:"
-            echo "$LINK"
-            echo "================================================="
-            echo ""
-          else
-            echo "No download requested. Skipping."
-          fi
-
       # 9. Auto-Restart Workflow
       - name: 🔄 Auto-Restart Server
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -f NO_RESTART ]; then
-            echo "🛑 Manual shutdown requested. Skipping auto-restart."
-            exit 0
-          fi
           echo "Triggering next workflow run to restart the server..."
           gh workflow run main.yml --ref ${{ github.ref_name }}
           echo "✅ Restart triggered successfully!"

@@ -69,6 +69,7 @@ jobs:
           echo "server-port=25565" > server/server.properties
           echo "online-mode=false" >> server/server.properties
           echo "motd=SuperSMP Server" >> server/server.properties
+          echo "allow-flight=true" >> server/server.properties
           echo "eula=true" > server/eula.txt
 
           # --- END PORTAL TOGGLE ---

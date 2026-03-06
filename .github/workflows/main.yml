@@ -254,6 +254,24 @@ jobs:
                 sleep 20
               fi
             fi
+            # --- Custom Commands: Check server logs ---
+            if [ -f logs/latest.log ]; then
+              LAST_LOG=$(tail -5 logs/latest.log)
+              if echo "$LAST_LOG" | grep -qi "shutdown"; then
+                echo "🛑 SHUTDOWN command detected! Stopping without restart..."
+                touch $GITHUB_WORKSPACE/NO_RESTART
+                echo "say 🛑 Server is shutting down permanently (no restart)..." > /proc/$SERVER_PID/fd/0
+                sleep 2
+                echo "stop" > /proc/$SERVER_PID/fd/0
+              fi
+              if echo "$LAST_LOG" | grep -qi "downloadworld"; then
+                echo "📥 DOWNLOADWORLD command detected! Stopping to generate download link..."
+                touch $GITHUB_WORKSPACE/DOWNLOAD_WORLD
+                echo "say 📥 Server is stopping to generate a world download link. It will restart after!" > /proc/$SERVER_PID/fd/0
+                sleep 2
+                echo "stop" > /proc/$SERVER_PID/fd/0
+              fi
+            fi
             sleep 10
           done
           
@@ -270,12 +288,33 @@ jobs:
           rclone copy backup.zip gdrive:MinecraftServer/
           echo "✅ Backup Complete!"
 
+      # 8.5. Generate World Download Link (only when downloadworld was used)
+      - name: 📥 Generate World Download Link
+        if: always()
+        run: |
+          if [ -f DOWNLOAD_WORLD ]; then
+            echo "Generating public download link..."
+            LINK=$(rclone link gdrive:MinecraftServer/backup.zip 2>&1) || true
+            echo ""
+            echo "================================================="
+            echo "📥 WORLD DOWNLOAD LINK:"
+            echo "$LINK"
+            echo "================================================="
+            echo ""
+          else
+            echo "No download requested. Skipping."
+          fi
+
       # 9. Auto-Restart Workflow
       - name: 🔄 Auto-Restart Server
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          if [ -f NO_RESTART ]; then
+            echo "🛑 Manual shutdown requested. Skipping auto-restart."
+            exit 0
+          fi
           echo "Triggering next workflow run to restart the server..."
           gh workflow run main.yml --ref ${{ github.ref_name }}
           echo "✅ Restart triggered successfully!"

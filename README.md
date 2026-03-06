@@ -13,6 +13,7 @@
 ## ✨ Features
 
 - **✅ 100% Free Hosting**: Powered completely by GitHub Actions' free runner tier.
+- **✅ 24/7 Auto-Restarts**: The server runs a continuous loop. Every 5.5 hours it restarts itself automatically, creating a near 24/7 experience.
 - **✅ Cross-Platform Play**: Java & Bedrock editions play together seamlessly (via Geyser).
 - **✅ Auto-Backups**: Every 5.5 hours, your world saves and zips itself straight into Google Drive.
 - **✅ High Performance**: Runs on a 4-Core CPU, 16GB RAM runner with 6GB dedicated to the Java heap. 

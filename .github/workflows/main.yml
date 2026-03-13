@@ -267,7 +267,8 @@ jobs:
         if: always()
         run: |
           cd server
-          zip -r backup.zip minecraft-worlds plugins -x "*.jar"
+          shopt -s nullglob
+          zip -r backup.zip minecraft-worlds plugins *.json -x "*.jar"
           rclone copy backup.zip gdrive:MinecraftServer/
           echo "✅ Backup Complete!"
 

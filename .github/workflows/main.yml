@@ -128,6 +128,10 @@ jobs:
             echo "max-build-height: 256" >> server/plugins/Geyser-Spigot/config.yml
           fi
 
+          if [ -d server/plugins/UltimateTeams ]; then
+            find server/plugins/UltimateTeams -name "*.yml" -type f -exec sed -i 's/"Not in a team"/""/g' {} +
+          fi
+
       # 7. Start Server & Tunnel (Combined to prevent GitHub killing background processes)
       - name: 🟢 Start Server
         env:

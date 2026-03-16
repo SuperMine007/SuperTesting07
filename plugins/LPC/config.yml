@@ -23,7 +23,7 @@
 #
 # More information: https://www.spigotmc.org/resources/68965
 
-chat-format: "[%ultimateteams_teamPrefix%] {prefix}{name}&r: {message}"
+chat-format: "[%ultimateteams_teamName%] {prefix}{name}&r: {message}"
 
 # Examples:
 # chat-format: "[{world}] {prefix}{name}&r: {message}"
@@ -33,8 +33,8 @@ chat-format: "[%ultimateteams_teamPrefix%] {prefix}{name}&r: {message}"
 # Per-group chat format. Overrides chat-format for the specified group.
 # YAML note: group names must be indented with exactly 2 spaces.
 group-formats:
-#  default: "[%ultimateteams_teamPrefix%] {prefix}{name}&r: {message}"
-#  admin: "[%ultimateteams_teamPrefix%] &c[Admin] {prefix}{name}&r: {message}"
+#  default: "[%ultimateteams_teamName%] {prefix}{name}&r: {message}"
+#  admin: "[%ultimateteams_teamName%] &c[Admin] {prefix}{name}&r: {message}"
 
 # Message shown after /lpc clear
 clear-chat-message: "&7Chat has been cleared by a staff member."

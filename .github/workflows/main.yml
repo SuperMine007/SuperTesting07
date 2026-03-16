@@ -262,13 +262,14 @@ jobs:
           wait $SERVER_PID || true
           echo "✅ Server process finished. Proceeding to backup..."
 
-      # 8. Auto-Backup (STRICT ORIGINAL LOGIC)
+      # 8. Auto-Backup (Includes worlds, player data, and all plugin data like Ultimate Teams .yml files)
       - name: 📤 Backup to Google Drive
         if: always()
         run: |
           cd server
           shopt -s nullglob
-          zip -r backup.zip minecraft-worlds plugins *.json -x "*.jar"
+          # The 'plugins' folder is zipped recursively, safely backing up all plugin configs, .yml files, and databases!
+          zip -r backup.zip minecraft-worlds plugins *.json *.yml -x "*.jar"
           rclone copy backup.zip gdrive:MinecraftServer/
           echo "✅ Backup Complete!"
 

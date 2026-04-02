@@ -107,6 +107,10 @@ You need to add these secret keys:
 *   **Name:** `END_PORTAL`
 *   **Value:** `true` or `false` (Controls whether the End dimension is generated/accessible).
 
+### 5. ANTI_XRAY (Optional)
+*   **Name:** `ANTI_XRAY`
+*   **Value:** `false` if you want to explicitly **disable** the server's built-in Anti-Xray defense. By default, our powerful Anti-Xray engine (Mode 2) is automatically enabled to block hackers!
+
 ---
 
 ## 💾 Setting Up Google Drive Backups (GDRIVE_CONFIG)

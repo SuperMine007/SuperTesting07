@@ -59,6 +59,7 @@ jobs:
         env:
           SEED_SECRET: ${{ secrets.SEED }}
           END_PORTAL: ${{ secrets.END_PORTAL }}
+          ANTI_XRAY: ${{ secrets.ANTI_XRAY }}
         run: |
           echo "settings:" > server/bukkit.yml
           echo "  world-container: minecraft-worlds" >> server/bukkit.yml
@@ -71,6 +72,17 @@ jobs:
           echo "motd=SuperSMP Server" >> server/server.properties
           echo "allow-flight=true" >> server/server.properties
           echo "eula=true" > server/eula.txt
+
+          # --- ANTI-XRAY TOGGLE ---
+          mkdir -p server/config
+          echo "anticheat:" > server/config/paper-world-defaults.yml
+          echo "  anti-xray:" >> server/config/paper-world-defaults.yml
+          if [ "$ANTI_XRAY" == "false" ]; then
+            echo "    enabled: false" >> server/config/paper-world-defaults.yml
+          else
+            echo "    enabled: true" >> server/config/paper-world-defaults.yml
+            echo "    engine-mode: 2" >> server/config/paper-world-defaults.yml
+          fi
 
           # --- END PORTAL TOGGLE ---
           if [ "$END_PORTAL" == "false" ]; then

@@ -55,7 +55,7 @@ inside that folder to drag & drop your .jar files (like Geyser, ViaVersion).
 STEP 4: SET THE SECRETS (The Keys)
 ------------------------------------------------------------
 Go to: Settings -> Secrets and variables -> Actions -> New repository secret.
-You need to add these 5 secrets:
+You need to add these 6 secrets:
 
 SECRET 1: PLAYIT_SECRET
    (Connects your server to the internet)
@@ -101,6 +101,9 @@ SECRET 4: SEED (Optional)
 
 SECRET 5: END_PORTAL (Optional)
    - Value: "true" or "false".
+
+SECRET 6: ANTI_XRAY (Optional)
+   - Value: "false" to turn off X-Ray protection. (It is ON by default).
 
 ------------------------------------------------------------
 STEP 5: FIRST LAUNCH & IP SETUP

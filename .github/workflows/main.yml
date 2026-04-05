@@ -1,3 +1,7 @@
+# ==========================================
+# Code created and maintained by: @GamingBurst007 (Discord/Insta)
+# Please give credit if you use or copy this code!
+# ==========================================
 name: Ultimate Minecraft Server (Google Drive)
 
 on:
@@ -61,6 +65,8 @@ jobs:
           END_PORTAL: ${{ secrets.END_PORTAL }}
           ANTI_XRAY: ${{ secrets.ANTI_XRAY }}
         run: |
+          # --- CREDIT WATERMARK ---
+          echo "Code by @GamingBurst007 (Discord/Insta)" > server/author.txt
           echo "settings:" > server/bukkit.yml
           echo "  world-container: minecraft-worlds" >> server/bukkit.yml
           
@@ -316,4 +322,7 @@ jobs:
         run: |
           echo "Triggering next workflow run to restart the server..."
           gh workflow run main.yml --ref ${{ github.ref_name }}
-          echo "✅ Restart triggered successfully!"
+          echo "✅ Restart triggered successfully! Thanks for using @GamingBurst007's script!"
+
+# --- End of Workflow ---
+# Developed by @GamingBurst007 (Discord/Insta)

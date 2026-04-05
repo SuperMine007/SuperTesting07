@@ -3,6 +3,7 @@
 </p>
 
 <h1 align="center">Ultimate Minecraft Server Actions</h1>
+<p align="center"><em>Created by @GamingBurst007 (Discord/Insta) - Please give credit if you use or fork this code!</em></p>
 
 <p align="center">
   <strong>A fully automated, free 24/7-style Minecraft server powered entirely by GitHub Actions, featuring Google Drive automatic backups, Bedrock crossplay, and Discord integration!</strong>
@@ -158,3 +159,6 @@ To get the IP Address, go to your [Playit.gg Dashboard](https://playit.gg) -> Cl
 
 *   **For Java Players:** Add a `Minecraft Java` tunnel. It will give you a linking domain (like `word.joinmc.link`).
 *   **For Bedrock Players:** Add a `Minecraft Bedrock` tunnel. It will give you an IP (`word.ply.gg`) and a 5-digit Port. Use these in the "Add Server" menu in Minecraft Bedrock!
+
+---
+> ⚠️ **Code created and maintained by @GamingBurst007 (Discord/Insta). If you use, modify, or share this project, please keep this credit!**

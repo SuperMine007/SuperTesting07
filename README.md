@@ -111,7 +111,7 @@ You need to add these secret keys:
 ### 5. ANTI_XRAY (Optional)
 *   **Name:** `ANTI_XRAY`
 *   **Value:** `false` if you want to explicitly **disable** the server's built-in Anti-Xray defense. By default, our powerful Anti-Xray engine (Mode 2) is automatically enabled to block hackers!
-*   **How to change Engine Mode:** You can switch between Mode 2 (heavier on server/network, replaces stone with fake ores) and Mode 1 (very light, just hides ores from being seen). To do this, open the `.github/workflows/main.yml` file and go exactly to **Line 91**. You will see: `echo "    engine-mode: 2" >> server/config/paper-world-defaults.yml`. Simply change that `2` to a `1` and commit the change!
+*   **How to change Engine Mode:** You can switch between Mode 2 (heavier on server/network, replaces stone with fake ores) and Mode 1 (very light, just hides ores from being seen). To do this, open the `.github/workflows/main.yml` file and go exactly to **Line 97**. You will see: `echo "    engine-mode: 2" >> server/config/paper-world-defaults.yml`. Simply change that `2` to a `1` and commit the change!
 
 ---
 

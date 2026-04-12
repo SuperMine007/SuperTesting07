@@ -54,7 +54,7 @@ There are two ways to set up the server. The "Fork" method takes less than 60 se
 #### Step 1: Create the Repository
 1. Go to your GitHub Homepage.
 2. Click the `+` icon in the top right -> `New repository`.
-3. Name it whatever you like (e.g., `SuperSMP-Server`).
+3. Name it whatever you like (e.g., `VoidBerrySMP-Server`).
 4. ⚠️ **CRITICAL:** Set Visibility to **"PUBLIC"**. If it is Private, your Action minutes are limited to 2,000 per month. Public repositories get *unlimited* free minutes!
 5. Click `Create repository`.
 
@@ -73,6 +73,13 @@ GitHub does not allow empty folders. We need to create a placeholder so we can u
 4. Type anything in the text box (like "folder created").
 5. Click `Commit changes`.
 6. You can now click `Add file` -> `Upload files` while inside the `plugins/` folder to upload `.jar` files (like Geyser, AuthMe, ViaVersion, etc). 
+
+#### Step 4: Add a Custom Server Logo (Optional)
+If you want a custom server icon to show up in the multiplayer server list for both Java and Bedrock players:
+1. Go back to your repo **homepage** (the main empty folder area).
+2. Click `Add file` -> `Upload files`.
+3. Upload an image file exactly named **`logo.png`** ⚠️ **(CRITICAL: The image MUST be exactly 64x64 pixels or Minecraft will ignore it!)**
+4. Click `Commit changes`. The server will automatically detect and apply it!
 
 ---
 

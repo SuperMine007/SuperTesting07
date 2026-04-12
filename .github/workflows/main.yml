@@ -80,7 +80,7 @@ jobs:
           
           echo "server-port=25565" > server/server.properties
           echo "online-mode=false" >> server/server.properties
-          echo "motd=SuperSMP Server" >> server/server.properties
+          echo "motd=VoidBerry SMP" >> server/server.properties
           echo "allow-flight=true" >> server/server.properties
           echo "rate-limit=0" >> server/server.properties
           echo "network-compression-threshold=256" >> server/server.properties
@@ -121,6 +121,12 @@ jobs:
                 echo "✅ New World Detected! Applying Secret Seed..."
                 echo "level-seed=$SEED_SECRET" >> server/server.properties
              fi
+          fi
+
+          # --- SERVER LOGO OPTIONAL ---
+          if [ -f logo.png ]; then
+            echo "✅ Custom logo.png found! Applying as server logo..."
+            cp logo.png server/server-icon.png
           fi
 
       # 5. Download Core & Plugins (Smart Version Check)

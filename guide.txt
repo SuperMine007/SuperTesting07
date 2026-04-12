@@ -52,6 +52,15 @@ Now you have a "plugins" folder! You can click "Add file" -> "Upload files"
 inside that folder to drag & drop your .jar files (like Geyser, ViaVersion).
 
 ------------------------------------------------------------
+OPTIONAL STEP: ADD A CUSTOM SERVER LOGO 
+------------------------------------------------------------
+Want a custom server icon in the multiplayer list (Java & Bedrock)?
+1. Go to your repo's MAIN homepage.
+2. Click "Add file" -> "Upload files".
+3. Upload a square image file named exactly: logo.png ⚠️ (CRITICAL: MUST BE EXACTLY 64x64 PIXELS!)
+4. Click "Commit changes". The server will automatically use it!
+
+------------------------------------------------------------
 STEP 4: SET THE SECRETS (The Keys)
 ------------------------------------------------------------
 Go to: Settings -> Secrets and variables -> Actions -> New repository secret.

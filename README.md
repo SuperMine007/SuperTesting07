@@ -118,7 +118,13 @@ You need to add these secret keys:
 ### 5. ANTI_XRAY (Optional)
 *   **Name:** `ANTI_XRAY`
 *   **Value:** `false` if you want to explicitly **disable** the server's built-in Anti-Xray defense. By default, our powerful Anti-Xray engine (Mode 2) is automatically enabled to block hackers!
-*   **How to change Engine Mode:** You can switch between Mode 2 (heavier on server/network, replaces stone with fake ores) and Mode 1 (very light, just hides ores from being seen). To do this, open the `.github/workflows/main.yml` file and go exactly to **Line 97**. You will see: `echo "    engine-mode: 2" >> server/config/paper-world-defaults.yml`. Simply change that `2` to a `1` and commit the change!
+*   **How to change Engine Mode:** You can switch between Mode 2 (heavier on server/network, replaces stone with fake ores) and Mode 1 (very light, just hides ores from being seen). To do this, open the `.github/workflows/main.yml` file and go exactly to **Line 97**. You will see: `echo "    engine-mode: 1" >> server/config/paper-world-defaults.yml`. Simply change that `1` to a `2` and commit the change!
+
+### 6. Changing Server Name (MOTD)
+*   **How to change:** Open the `.github/workflows/main.yml` file and go to **Line 83**. You will see: `echo "motd=VoidBerry SMP" >> server/server.properties`. Replace `VoidBerry SMP` with your new server name and commit the change!
+
+### 7. Disabling Auto-Restart (Maintenance Mode)
+*   **How to disable:** If you need to temporarily stop the server from automatically restarting, open `.github/workflows/main.yml` and go to **Line 330** in the Auto-Restart section. You will see: `gh workflow run main.yml --ref ${{ github.ref_name }}`. Simply add a `#` at the beginning of the code line like this: `# gh workflow run main.yml --ref ${{ github.ref_name }}`. To turn auto-restart back on, just remove the `#`!
 
 ---
 

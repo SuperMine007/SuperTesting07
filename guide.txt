@@ -118,17 +118,17 @@ SECRET 6: ANTI_XRAY (Optional)
 HOW TO CHANGE SERVER SETTINGS (Name, Restart, etc.)
 ------------------------------------------------------------
 1. CHANGE ANTI-XRAY ENGINE MODE:
-   - Edit .github/workflows/main.yml and go to Line 97.
+   - Edit .github/workflows/main.yml and go to Line 101.
    - You will see: echo "    engine-mode: 1" >> server/config/paper-world-defaults.yml
    - Change the "1" to a "2" (or vice-versa).
 
 2. CHANGE SERVER NAME (MOTD):
-   - Edit .github/workflows/main.yml and go to Line 83.
+   - Edit .github/workflows/main.yml and go to Line 87.
    - You will see: echo "motd=VoidBerry SMP" >> server/server.properties
    - Change "VoidBerry SMP" to your preferred name.
 
 3. TURN OFF AUTO-RESTART (For Maintenance):
-   - Edit .github/workflows/main.yml and go to Line 330.
+   - Edit .github/workflows/main.yml and go to Line 334.
    - You will see: gh workflow run main.yml --ref ${{ github.ref_name }}
    - Add a "#" at the start of this line to turn off auto-restart:
      # gh workflow run main.yml --ref ${{ github.ref_name }}

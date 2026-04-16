@@ -10,6 +10,10 @@ on:
 jobs:
   server:
     runs-on: ubuntu-latest
+    # Set the global timezone for the entire Linux Runner to IST
+    # This prevents the timezone desync between Playit, Java, and Plugins!
+    env:
+      TZ: Asia/Kolkata
     permissions:
       actions: write
       contents: read

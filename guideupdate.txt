@@ -1,0 +1,29 @@
+============================================================
+       HOW TO UPDATE MINECRAFT SERVER VERSION (MANUAL)
+============================================================
+
+By default, the server is set to run Paper version "1.21.11". If a new major Minecraft update releases (for example, 1.22.x or 1.26.1 etc.), you can easily update the server manually. 
+
+Don't worry, updating to a future/newer version will NOT corrupt your world! The Java engine natively converts your old chunks seamlessly.
+
+❓ WHAT IF I TYPE THE WRONG VERSION?
+Your world is completely safe! The creator of the code wrote a "Smart Version Check" to prevent the server from breaking.
+1. It contacts the official PaperMC database API and searches for the exact version you typed.
+2. If the API responds that the version is fake, typed incorrectly, or unreleased, the safety net is triggered.
+3. Instead of downloading a corrupted file, the script prints a warning and automatically falls back to downloading the newest, most recent stable version available at that time.
+Because it falls back to a perfectly stable, valid release file, your world is never exposed to fake software and will boot up completely intact!
+
+HOW TO CHANGE THE VERSION:
+1. Open the `.github/workflows/main.yml` file in your repository.
+2. Scroll down to exactly **Line 139**.
+3. You will see this line of code:
+   TARGET_VERSION="1.21.11"
+4. Change "1.21.11" to your desired new version. For example:
+   TARGET_VERSION="1.26.1"
+5. Click "Commit changes" (the green button) to save the file.
+
+⚠️ CRITICAL WARNINGS:
+- ONLY UPGRADE: Never downgrade your version (e.g., from 1.26.1 back to 1.21.11). Downgrading Minecraft will corrupt your world irreversibly!
+- NO EXPERIMENTAL VERSIONS: Do NOT use experimental builds, snapshots, or release candidates (like `1.22-rc1`). Experimental versions are highly unstable, chunks can corrupt, and plugins will completely break. If it corrupts your world, the auto-backup system will upload the corrupted save and permanently overwrite your good Google Drive backup! 
+- COMPATIBLE PLUGINS: If you update your server to a massive new version, make sure you ALSO replace your .jar files in the `plugins/` folder to versions that support the new Minecraft update (e.g., update Geyser, ViaVersion, AuthMe, etc.). Using outdated plugins on a new version will break them.
+- EXACT VERSION: Make sure the version you type actually exists on PaperMC. You must type the *exact* version tag (e.g., "1.21.3", not just "1.21").

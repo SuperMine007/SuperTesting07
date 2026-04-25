@@ -105,6 +105,10 @@ jobs:
           echo "tick-rates:" >> server/config/paper-world-defaults.yml
           echo "  container-update: 2" >> server/config/paper-world-defaults.yml
           
+          # --- VANILLA SEED FIX (Forces exact Vanilla structure generation) ---
+          echo "feature-seeds:" >> server/config/paper-world-defaults.yml
+          echo "  generate-random-seeds-for-all: false" >> server/config/paper-world-defaults.yml
+          
           # --- PAPER GLOBAL NETWORK CONFIG ---
           echo "packet-limiter:" > server/config/paper-global.yml
           echo "  all-packets:" >> server/config/paper-global.yml
@@ -131,6 +135,31 @@ jobs:
           if [ -f logo.png ]; then
             echo "✅ Custom logo.png found! Applying as server logo..."
             cp logo.png server/server-icon.png
+          fi
+
+          # --- JAVA RESOURCE PACK ---
+          if [ -d java-pack ]; then
+            JAVA_VP=$(find java-pack -name "*.zip" | head -n 1)
+            if [ -n "$JAVA_VP" ]; then
+              echo "✅ Java Resource Pack detected: $JAVA_VP"
+              PACK_NAME=$(basename "$JAVA_VP")
+              PACK_SHA=$(sha1sum "$JAVA_VP" | awk '{print $1}')
+              PACK_URL="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/java-pack/$PACK_NAME"
+              echo "resource-pack=$PACK_URL" >> server/server.properties
+              echo "resource-pack-sha1=$PACK_SHA" >> server/server.properties
+              echo "require-resource-pack=true" >> server/server.properties
+              echo "resource-pack-prompt=Optional Java Resource Pack available! Click Yes to download." >> server/server.properties
+            fi
+          fi
+          
+          # --- BEDROCK RESOURCE PACK ---
+          if [ -d bedrock-pack ]; then
+            mkdir -p server/plugins/Geyser-Spigot/packs
+            if ls bedrock-pack/*.mcpack 1> /dev/null 2>&1 || ls bedrock-pack/*.zip 1> /dev/null 2>&1; then
+              echo "✅ Bedrock Resource Pack detected! Copying to Geyser..."
+              cp bedrock-pack/*.mcpack server/plugins/Geyser-Spigot/packs/ 2>/dev/null || true
+              cp bedrock-pack/*.zip server/plugins/Geyser-Spigot/packs/ 2>/dev/null || true
+            fi
           fi
 
       # 5. Download Core & Plugins (Smart Version Check)
@@ -173,6 +202,7 @@ jobs:
             echo "max-build-height: 256" >> server/plugins/Geyser-Spigot/config.yml
             echo "cache-chunks: true" >> server/plugins/Geyser-Spigot/config.yml
             echo "forward-player-ping: true" >> server/plugins/Geyser-Spigot/config.yml
+            echo "force-resource-packs: true" >> server/plugins/Geyser-Spigot/config.yml
           fi
 
           if [ -d server/plugins/UltimateTeams ]; then

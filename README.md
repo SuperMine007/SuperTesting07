@@ -83,6 +83,26 @@ If you want a custom server icon to show up in the multiplayer server list for b
 
 ---
 
+## 🎨 Adding Resource Packs (Java & Bedrock)
+
+You can easily offer optional Resource Packs to your players automatically! The folders are already set up in the repository for you. 
+
+### For Java Players (`java-pack` folder)
+If you want Java players to be prompted with "Download Server Resource Pack" when they join, you can place a `.zip` pack into the `java-pack` folder.
+1. Open the `java-pack` folder in your repository.
+2. Click `Add file` -> `Upload files`.
+3. Upload your standard Java resource pack **as a `.zip` file** (e.g., `mypack.zip`).
+4. Click `Commit changes`. The server will automatically detect the file, link it directly through GitHub's raw download server, and prompt players in-game! (Resource packs are **required**—players MUST accept the download to join).
+
+### For Bedrock Players (`bedrock-pack` folder)
+Geyser handles Bedrock packs independently and streams them natively.
+1. Open the `bedrock-pack` folder in your repository.
+2. Click `Add file` -> `Upload files`.
+3. Upload your Bedrock texture packs **as `.mcpack` files** (or `.zip`).
+4. Click `Commit changes`. The server will automatically load these into Geyser, and Bedrock mobile/console players will be **forced** to download them upon joining before they can play!
+
+---
+
 ## 🔑 Secret Keys Configuration 
 
 To make the server work, you need to provide it with "Secrets" (hidden private passwords).

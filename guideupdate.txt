@@ -15,7 +15,7 @@ Because it falls back to a perfectly stable, valid release file, your world is n
 
 HOW TO CHANGE THE VERSION:
 1. Open the `.github/workflows/main.yml` file in your repository.
-2. Scroll down to exactly **Line 139**.
+2. Scroll down to exactly **Line 168**.
 3. You will see this line of code:
    TARGET_VERSION="1.21.11"
 4. Change "1.21.11" to your desired new version. For example:

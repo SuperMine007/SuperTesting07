@@ -144,10 +144,10 @@ You need to add these secret keys:
 *   **How to change:** Open the `.github/workflows/main.yml` file and go to **Line 87**. You will see: `echo "motd=VoidBerry SMP" >> server/server.properties`. Replace `VoidBerry SMP` with your new server name and commit the change!
 
 ### 7. Disabling Auto-Restart (Maintenance Mode)
-*   **How to disable:** If you need to temporarily stop the server from automatically restarting, open `.github/workflows/main.yml` and go to **Line 334** in the Auto-Restart section. You will see: `gh workflow run main.yml --ref ${{ github.ref_name }}`. Simply add a `#` at the beginning of the code line like this: `# gh workflow run main.yml --ref ${{ github.ref_name }}`. To turn auto-restart back on, just remove the `#`!
+*   **How to disable:** If you need to temporarily stop the server from automatically restarting, open `.github/workflows/main.yml` and go to **Line 364** in the Auto-Restart section. You will see: `gh workflow run main.yml --ref ${{ github.ref_name }}`. Simply add a `#` at the beginning of the code line like this: `# gh workflow run main.yml --ref ${{ github.ref_name }}`. To turn auto-restart back on, just remove the `#`!
 
 ### 8. Updating the Minecraft Version
-*   **How to update:** By default, the server targets version `1.21.11`. If you want to update to a newly released future version (e.g., `1.26.1`), open `.github/workflows/main.yml` and go to exactly **Line 139**. 
+*   **How to update:** By default, the server targets version `1.21.11`. If you want to update to a newly released future version (e.g., `1.26.1`), open `.github/workflows/main.yml` and go to exactly **Line 168**. 
     *   You will see: `TARGET_VERSION="1.21.11"`
     *   Change the version strictly to the new exact version number, for example: `TARGET_VERSION="1.26.1"`
 *   **Will it corrupt my world?** No! Updating your world to a future/newer version is completely safe and the built-in game engine automatically upgrades the chunks safely. **However, you must NEVER downgrade** to an older version (e.g., 1.26.1 back to 1.21.11) as downgrading will instantly corrupt the world.

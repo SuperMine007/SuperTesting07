@@ -143,8 +143,9 @@ jobs:
             if [ -n "$JAVA_VP" ]; then
               echo "✅ Java Resource Pack detected: $JAVA_VP"
               PACK_NAME=$(basename "$JAVA_VP")
+              PACK_NAME_ENCODED="${PACK_NAME// /%20}"
               PACK_SHA=$(sha1sum "$JAVA_VP" | awk '{print $1}')
-              PACK_URL="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/java-pack/$PACK_NAME"
+              PACK_URL="https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/java-pack/$PACK_NAME_ENCODED"
               echo "resource-pack=$PACK_URL" >> server/server.properties
               echo "resource-pack-sha1=$PACK_SHA" >> server/server.properties
               echo "require-resource-pack=true" >> server/server.properties

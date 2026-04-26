@@ -138,16 +138,16 @@ You need to add these secret keys:
 ### 5. ANTI_XRAY (Optional)
 *   **Name:** `ANTI_XRAY`
 *   **Value:** `false` if you want to explicitly **disable** the server's built-in Anti-Xray defense. By default, our powerful Anti-Xray engine (Mode 2) is automatically enabled to block hackers!
-*   **How to change Engine Mode:** You can switch between Mode 2 (heavier on server/network, replaces stone with fake ores) and Mode 1 (very light, just hides ores from being seen). To do this, open the `.github/workflows/main.yml` file and go exactly to **Line 101**. You will see: `echo "    engine-mode: 1" >> server/config/paper-world-defaults.yml`. Simply change that `1` to a `2` and commit the change!
+*   **How to change Engine Mode:** You can switch between Mode 2 (heavier on server/network, replaces stone with fake ores) and Mode 1 (very light, just hides ores from being seen). To do this, open the `.github/workflows/main.yml` file and go exactly to **Line 107**. You will see: `echo "    engine-mode: 1" >> server/config/paper-world-defaults.yml`. Simply change that `1` to a `2` and commit the change!
 
 ### 6. Changing Server Name (MOTD)
-*   **How to change:** Open the `.github/workflows/main.yml` file and go to **Line 87**. You will see: `echo "motd=VoidBerry SMP" >> server/server.properties`. Replace `VoidBerry SMP` with your new server name and commit the change!
+*   **How to change:** Open the `.github/workflows/main.yml` file and go to **Line 93**. You will see: `echo "motd=VoidBerry SMP" >> server/server.properties`. Replace `VoidBerry SMP` with your new server name and commit the change!
 
 ### 7. Disabling Auto-Restart (Maintenance Mode)
-*   **How to disable:** If you need to temporarily stop the server from automatically restarting, open `.github/workflows/main.yml` and go to **Line 364** in the Auto-Restart section. You will see: `gh workflow run main.yml --ref ${{ github.ref_name }}`. Simply add a `#` at the beginning of the code line like this: `# gh workflow run main.yml --ref ${{ github.ref_name }}`. To turn auto-restart back on, just remove the `#`!
+*   **How to disable:** If you need to temporarily stop the server from automatically restarting, open `.github/workflows/main.yml` and go to **Line 371** in the Auto-Restart section. You will see: `gh workflow run main.yml --ref ${{ github.ref_name }}`. Simply add a `#` at the beginning of the code line like this: `# gh workflow run main.yml --ref ${{ github.ref_name }}`. To turn auto-restart back on, just remove the `#`!
 
 ### 8. Updating the Minecraft Version
-*   **How to update:** By default, the server targets version `1.21.11`. If you want to update to a newly released future version (e.g., `1.26.1`), open `.github/workflows/main.yml` and go to exactly **Line 168**. 
+*   **How to update:** By default, the server targets version `1.21.11`. If you want to update to a newly released future version (e.g., `1.26.1`), open `.github/workflows/main.yml` and go to exactly **Line 175**. 
     *   You will see: `TARGET_VERSION="1.21.11"`
     *   Change the version strictly to the new exact version number, for example: `TARGET_VERSION="1.26.1"`
 *   **Will it corrupt my world?** No! Updating your world to a future/newer version is completely safe and the built-in game engine automatically upgrades the chunks safely. **However, you must NEVER downgrade** to an older version (e.g., 1.26.1 back to 1.21.11) as downgrading will instantly corrupt the world.

@@ -81,6 +81,12 @@ jobs:
           echo "  moved-too-quickly-multiplier: 10.0" >> server/spigot.yml
           echo "  timeout-time: 120" >> server/spigot.yml
           echo "  netty-threads: 4" >> server/spigot.yml
+          echo "world-settings:" >> server/spigot.yml
+          echo "  default:" >> server/spigot.yml
+          echo "    seed-endcity: 0" >> server/spigot.yml
+          echo "    seed-village: 0" >> server/spigot.yml
+          echo "    seed-monument: 0" >> server/spigot.yml
+          echo "    seed-slime: 0" >> server/spigot.yml
           
           echo "server-port=25565" > server/server.properties
           echo "online-mode=false" >> server/server.properties

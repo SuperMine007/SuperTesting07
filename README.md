@@ -144,16 +144,21 @@ You need to add these secret keys:
 *   **How to change:** Open the `.github/workflows/main.yml` file and go to **Line 93**. You will see: `echo "motd=VoidBerry SMP" >> server/server.properties`. Replace `VoidBerry SMP` with your new server name and commit the change!
 
 ### 7. Disabling Auto-Restart (Maintenance Mode)
-*   **How to disable:** If you need to temporarily stop the server from automatically restarting, open `.github/workflows/main.yml` and go to **Line 371** in the Auto-Restart section. You will see: `gh workflow run main.yml --ref ${{ github.ref_name }}`. Simply add a `#` at the beginning of the code line like this: `# gh workflow run main.yml --ref ${{ github.ref_name }}`. To turn auto-restart back on, just remove the `#`!
+*   **How to disable:** If you need to temporarily stop the server from automatically restarting, open `.github/workflows/main.yml` and go to **Line 373** in the Auto-Restart section. You will see: `gh workflow run main.yml --ref ${{ github.ref_name }}`. Simply add a `#` at the beginning of the code line like this: `# gh workflow run main.yml --ref ${{ github.ref_name }}`. To turn auto-restart back on, just remove the `#`!
 
 ### 8. Updating the Minecraft Version
-*   **How to update:** By default, the server targets version `1.21.11`. If you want to update to a newly released future version (e.g., `1.26.1`), open `.github/workflows/main.yml` and go to exactly **Line 175**. 
+*   **How to update:** By default, the server targets version `1.21.11`. If you want to update to a newly released future version (e.g., `1.26.1`), open `.github/workflows/main.yml` and go to exactly **Line 177**. 
     *   You will see: `TARGET_VERSION="1.21.11"`
     *   Change the version strictly to the new exact version number, for example: `TARGET_VERSION="1.26.1"`
 *   **Will it corrupt my world?** No! Updating your world to a future/newer version is completely safe and the built-in game engine automatically upgrades the chunks safely. **However, you must NEVER downgrade** to an older version (e.g., 1.26.1 back to 1.21.11) as downgrading will instantly corrupt the world.
 *   **Smart Version Check:** If you accidentally target a typo, a fake version, or an unreleased version, your world will not corrupt! The server has a built-in safety net that checks the official API. If it's fake, it will safely reject it, print a warning, and automatically fall back to downloading the newest stable release.
 *   ⚠️ **NO EXPERIMENTAL VERSIONS:** Please avoid using snapshots or experimental release candidates (like `1.22-rc1`). They are highly unstable and plugins won't support them. If they corrupt your chunks natively, our Auto-Backup system will upload the broken save to Google Drive and permanently overwrite your good backup!
 *   ⚠️ **CRITICAL (PLUGINS):** When you change the core server version, you *must* also manually download the newest matching `.jar` files for all your plugins (like Geyser, ViaVersion, etc.) and upload them to your `plugins/` folder to replace the old ones. Incompatible plugins will cause server errors!
+
+### 9. Enable/Disable TNT Duper
+*   **How to toggle:** By default, the TNT duper/piston duplication is now enabled. To disable it, open `.github/workflows/main.yml` and go exactly to **Line 124**. 
+    *   You will see: `echo "  allow-piston-duplication: true" >> server/config/paper-global.yml`
+    *   Simply change `true` to `false` and commit the change!
 
 ---
 

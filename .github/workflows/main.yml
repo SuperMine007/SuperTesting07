@@ -115,11 +115,13 @@ jobs:
           echo "feature-seeds:" >> server/config/paper-world-defaults.yml
           echo "  generate-random-seeds-for-all: false" >> server/config/paper-world-defaults.yml
           
-          # --- PAPER GLOBAL NETWORK CONFIG ---
+          # --- PAPER GLOBAL NETWORK CONFIG & TNT DUPER ---
           echo "packet-limiter:" > server/config/paper-global.yml
           echo "  all-packets:" >> server/config/paper-global.yml
           echo "    max-packet-rate: 5000.0" >> server/config/paper-global.yml
           echo "    interval: 7.0" >> server/config/paper-global.yml
+          echo "unsupported-settings:" >> server/config/paper-global.yml
+          echo "  allow-piston-duplication: true" >> server/config/paper-global.yml
 
           # --- END PORTAL TOGGLE ---
           if [ "$END_PORTAL" == "false" ]; then

@@ -176,42 +176,52 @@ jobs:
         run: |
           TARGET_VERSION="26.1.2"
           PROJECT_URL="https://fill.papermc.io/v3/projects/paper"
+          # User-Agent is required by the v3 API or requests may be rejected
+          UA="GamingBurst007-MCServer/1.0 (https://github.com/${{ github.repository }})"
           
-          # Fetch the full versions object from the v3 API (grouped structure)
-          VERSIONS_JSON=$(curl -s $PROJECT_URL)
+          # Fetch the full versions object from the v3 API
+          # Real response structure: { "versions": { "26.1": ["26.1.2","26.1.1"], "1.21": ["1.21.11"] } }
+          VERSIONS_JSON=$(curl -s -H "User-Agent: $UA" $PROJECT_URL)
           
-          # Check if our target version exists anywhere inside the grouped structure
-          # .versions is an object like { "26.1": ["26.1.2","26.1.1"], "1.21": ["1.21.11"] }
-          # We flatten all version arrays with .versions[][] and look for an exact match
-          VERSION_EXISTS=$(echo "$VERSIONS_JSON" | jq -r --arg tv "$TARGET_VERSION" '.versions[][] | select(. == $tv)' | head -n 1)
+          # Flatten all versions from all groups into one list and check if our target exists
+          # .versions | to_entries[] | .value[] iterates every version string across all groups
+          VERSION_EXISTS=$(echo "$VERSIONS_JSON" | jq -r --arg tv "$TARGET_VERSION" \
+            '.versions | to_entries[] | .value[] | select(. == $tv)' | head -n 1)
           
           if [ -n "$VERSION_EXISTS" ]; then
             VERSION="$TARGET_VERSION"
             echo "✅ Targeting version $VERSION"
           else
-            # Fallback: grab the very last version from the last group in the object
-            VERSION=$(echo "$VERSIONS_JSON" | jq -r '.versions | to_entries[-1].value[-1]')
+            # Fallback: official docs use to_entries[0].value[0] for the latest version
+            VERSION=$(echo "$VERSIONS_JSON" | jq -r '.versions | to_entries[0] | .value[0]')
             echo "⚠️ Version $TARGET_VERSION not found. Falling back to latest: $VERSION"
           fi
           
-          # Find which version-group this version belongs to
-          # e.g. "26.1.2" lives in group "26.1"
-          VERSION_GROUP=$(echo "$VERSIONS_JSON" | jq -r --arg v "$VERSION" '.versions | to_entries[] | select(.value[] == $v) | .key')
+          # Fetch builds for this version
+          # CRITICAL: The v3 builds endpoint returns a TOP-LEVEL ARRAY — NOT a {"builds":[...]} wrapper!
+          # Each build object has: .id (number), .channel ("STABLE"/"ALPHA"), .downloads."server:default".url
+          # The URL is embedded directly in the response — do NOT manually construct it!
+          BUILDS_JSON=$(curl -s -H "User-Agent: $UA" "$PROJECT_URL/versions/$VERSION/builds")
           
-          # Fetch all builds for that version-group from the v3 API
-          BUILDS_JSON=$(curl -s "$PROJECT_URL/version-group/$VERSION_GROUP/builds")
+          # Try to get the download URL from the newest STABLE build first
+          # Official docs pattern: first(.[] | select(.channel == "STABLE") | .downloads."server:default".url) // "null"
+          PAPERMC_URL=$(echo "$BUILDS_JSON" | jq -r \
+            'first(.[] | select(.channel == "STABLE") | .downloads."server:default".url) // "null"')
           
-          # Try to find the newest STABLE build first (channel == "STABLE")
-          BUILD=$(echo "$BUILDS_JSON" | jq -r '[.builds[] | select(.channel == "STABLE")] | last | .build // empty')
-          
-          if [ -z "$BUILD" ]; then
+          if [ "$PAPERMC_URL" == "null" ]; then
             # No STABLE build found — fallback to the newest available build of any channel
             echo "⚠️ No STABLE build found for $VERSION. Falling back to newest available build..."
-            BUILD=$(echo "$BUILDS_JSON" | jq -r '.builds | last | .build')
+            PAPERMC_URL=$(echo "$BUILDS_JSON" | jq -r \
+              'last(.[] | .downloads."server:default".url) // "null"')
           fi
           
-          echo "✅ Selected build: $BUILD"
-          wget -O server/paper.jar "$PROJECT_URL/version-group/$VERSION_GROUP/builds/$BUILD/downloads/paper-$VERSION-$BUILD.jar"
+          if [ "$PAPERMC_URL" == "null" ]; then
+            echo "❌ ERROR: Could not find a valid Paper download URL. Aborting."
+            exit 1
+          fi
+          
+          echo "✅ Downloading Paper from: $PAPERMC_URL"
+          wget -O server/paper.jar "$PAPERMC_URL"
           
           cp -r plugins/* server/plugins/
 

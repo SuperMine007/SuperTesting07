@@ -182,7 +182,7 @@ jobs:
             echo "âœ… Targeting version $VERSION"
           else
             VERSION=$(curl -s $PROJECT_URL | jq -r '.versions[-1]')
-            echo "âš ï¸ Version $TARGET_VERSION not found. Falling back to latest: $VERSION"
+            echo "âš ï¸ Version $TARGET_VERSION not found. Falling back to latest: $VERSION"
           fi
           
           BUILD=$(curl -s $PROJECT_URL/versions/$VERSION | jq '.builds[-1]')
@@ -255,7 +255,7 @@ jobs:
           echo "ðŸ–¥ï¸ JAVA IP: ${JAVA_IP:-Check playit.gg dashboard}"
           BEDROCK_INFO=$(grep -oE '[a-zA-Z0-9.-]+\.ply\.gg:[0-9]+' playit_log.txt | head -n 1)
           if [ -z "$JAVA_IP" ] && [ -z "$PLAYIT_SECRET" ]; then
-             echo "âš ï¸ SERVER HAS NO IP! YOU MUST CLICK THE CLAIM LINK ABOVE âš ï¸"
+             echo "âš ï¸ SERVER HAS NO IP! YOU MUST CLICK THE CLAIM LINK ABOVE âš ï¸"
           else
              echo "ðŸ“± BEDROCK: ${BEDROCK_INFO:-Check playit.gg dashboard}"
           fi
@@ -285,7 +285,7 @@ jobs:
             
             # --- WARNING 1: 30 Minutes Left (at 18000s) ---
             if [ $ELAPSED -ge 18000 ] && [ "$WARNED_30" == "false" ]; then
-                echo "say âš ï¸ NOTICE: Server will shutdown in 30 minutes!" > /proc/$SERVER_PID/fd/0
+                echo "say âš ï¸ NOTICE: Server will shutdown in 30 minutes!" > /proc/$SERVER_PID/fd/0
                 WARNED_30="true"
             fi
 
@@ -323,7 +323,7 @@ jobs:
               
               # If still running after 60s, FORCE KILL
               if kill -0 $SERVER_PID 2>/dev/null; then
-                 echo "âš ï¸ Server stuck! Force killing to ensure backup..."
+                 echo "âš ï¸ Server stuck! Force killing to ensure backup..."
                  kill -9 $SERVER_PID
               fi
               break
@@ -332,7 +332,7 @@ jobs:
             PLAYIT_CHECK=$((ELAPSED % 60))
             if [ "$PLAYIT_CHECK" -lt 11 ]; then
               if ! kill -0 $PLAYIT_PID 2>/dev/null; then
-                echo "âš ï¸ Playit tunnel crashed! Here is the error log:"
+                echo "âš ï¸ Playit tunnel crashed! Here is the error log:"
                 cat $GITHUB_WORKSPACE/playit_log.txt || echo "No log found."
                 echo "Restarting Playit..."
                 if [ -z "$PLAYIT_SECRET" ]; then

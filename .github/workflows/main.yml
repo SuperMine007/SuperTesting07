@@ -122,6 +122,10 @@ jobs:
           echo "    interval: 7.0" >> server/config/paper-global.yml
           echo "unsupported-settings:" >> server/config/paper-global.yml
           echo "  allow-piston-duplication: true" >> server/config/paper-global.yml
+          
+          # --- ENABLE PROXY PROTOCOL FOR REAL IPs ---
+          echo "proxies:" >> server/config/paper-global.yml
+          echo "  proxy-protocol: true" >> server/config/paper-global.yml
 
           # --- END PORTAL TOGGLE ---
           if [ "$END_PORTAL" == "false" ]; then

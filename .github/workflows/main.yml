@@ -44,10 +44,10 @@ jobs:
         run: |
           mkdir -p ~/.config/rclone
           echo "$GDRIVE_CONFIG" > ~/.config/rclone/rclone.conf
-          echo "✅ Google Drive Configured!"
+          echo "âœ… Google Drive Configured!"
 
       # 3. Restore Backup (STRICT ORIGINAL LOGIC)
-      - name: 📥 Restore Backup
+      - name: ðŸ“¥ Restore Backup
         run: |
           mkdir -p server/minecraft-worlds
           mkdir -p server/plugins
@@ -134,14 +134,14 @@ jobs:
           # --- SEED LOGIC (STRICT ORIGINAL) ---
           if [ ! -f server/BACKUP_WAS_RESTORED ]; then
              if [ -n "$SEED_SECRET" ]; then
-                echo "✅ New World Detected! Applying Secret Seed..."
+                echo "âœ… New World Detected! Applying Secret Seed..."
                 echo "level-seed=$SEED_SECRET" >> server/server.properties
              fi
           fi
 
           # --- SERVER LOGO OPTIONAL ---
           if [ -f logo.png ]; then
-            echo "✅ Custom logo.png found! Applying as server logo..."
+            echo "âœ… Custom logo.png found! Applying as server logo..."
             cp logo.png server/server-icon.png
           fi
 
@@ -149,7 +149,7 @@ jobs:
           if [ -d java-pack ]; then
             JAVA_VP=$(find java-pack -name "*.zip" | head -n 1)
             if [ -n "$JAVA_VP" ]; then
-              echo "✅ Java Resource Pack detected: $JAVA_VP"
+              echo "âœ… Java Resource Pack detected: $JAVA_VP"
               PACK_NAME=$(basename "$JAVA_VP")
               PACK_NAME_ENCODED="${PACK_NAME// /%20}"
               PACK_SHA=$(sha1sum "$JAVA_VP" | awk '{print $1}')
@@ -165,7 +165,7 @@ jobs:
           if [ -d bedrock-pack ]; then
             mkdir -p server/plugins/Geyser-Spigot/packs
             if ls bedrock-pack/*.mcpack 1> /dev/null 2>&1 || ls bedrock-pack/*.zip 1> /dev/null 2>&1; then
-              echo "✅ Bedrock Resource Pack detected! Copying to Geyser..."
+              echo "âœ… Bedrock Resource Pack detected! Copying to Geyser..."
               cp bedrock-pack/*.mcpack server/plugins/Geyser-Spigot/packs/ 2>/dev/null || true
               cp bedrock-pack/*.zip server/plugins/Geyser-Spigot/packs/ 2>/dev/null || true
             fi
@@ -174,59 +174,24 @@ jobs:
       # 5. Download Core & Plugins (Smart Version Check)
       - name: Download Paper (Smart Version Check) & Plugins
         run: |
-          TARGET_VERSION="26.1.2"
-          PROJECT_URL="https://fill.papermc.io/v3/projects/paper"
-          # User-Agent is required by the v3 API or requests may be rejected
-          UA="GamingBurst007-MCServer/1.0 (https://github.com/${{ github.repository }})"
+          TARGET_VERSION="1.21.11"
+          PROJECT_URL="https://api.papermc.io/v2/projects/paper"
           
-          # Fetch the full versions object from the v3 API
-          # Real response structure: { "versions": { "26.1": ["26.1.2","26.1.1"], "1.21": ["1.21.11"] } }
-          VERSIONS_JSON=$(curl -s -H "User-Agent: $UA" $PROJECT_URL)
-          
-          # Flatten all versions from all groups into one list and check if our target exists
-          # .versions | to_entries[] | .value[] iterates every version string across all groups
-          VERSION_EXISTS=$(echo "$VERSIONS_JSON" | jq -r --arg tv "$TARGET_VERSION" \
-            '.versions | to_entries[] | .value[] | select(. == $tv)' | head -n 1)
-          
-          if [ -n "$VERSION_EXISTS" ]; then
+          if curl -s $PROJECT_URL | jq -e ".versions | index(\"$TARGET_VERSION\")" > /dev/null; then
             VERSION="$TARGET_VERSION"
-            echo "✅ Targeting version $VERSION"
+            echo "âœ… Targeting version $VERSION"
           else
-            # Fallback: official docs use to_entries[0].value[0] for the latest version
-            VERSION=$(echo "$VERSIONS_JSON" | jq -r '.versions | to_entries[0] | .value[0]')
-            echo "⚠️ Version $TARGET_VERSION not found. Falling back to latest: $VERSION"
+            VERSION=$(curl -s $PROJECT_URL | jq -r '.versions[-1]')
+            echo "âš ï¸ Version $TARGET_VERSION not found. Falling back to latest: $VERSION"
           fi
           
-          # Fetch builds for this version
-          # CRITICAL: The v3 builds endpoint returns a TOP-LEVEL ARRAY — NOT a {"builds":[...]} wrapper!
-          # Each build object has: .id (number), .channel ("STABLE"/"ALPHA"), .downloads."server:default".url
-          # The URL is embedded directly in the response — do NOT manually construct it!
-          BUILDS_JSON=$(curl -s -H "User-Agent: $UA" "$PROJECT_URL/versions/$VERSION/builds")
-          
-          # Try to get the download URL from the newest STABLE build first
-          # Official docs pattern: first(.[] | select(.channel == "STABLE") | .downloads."server:default".url) // "null"
-          PAPERMC_URL=$(echo "$BUILDS_JSON" | jq -r \
-            'first(.[] | select(.channel == "STABLE") | .downloads."server:default".url) // "null"')
-          
-          if [ "$PAPERMC_URL" == "null" ]; then
-            # No STABLE build found — fallback to the newest available build of any channel
-            echo "⚠️ No STABLE build found for $VERSION. Falling back to newest available build..."
-            PAPERMC_URL=$(echo "$BUILDS_JSON" | jq -r \
-              'last(.[] | .downloads."server:default".url) // "null"')
-          fi
-          
-          if [ "$PAPERMC_URL" == "null" ]; then
-            echo "❌ ERROR: Could not find a valid Paper download URL. Aborting."
-            exit 1
-          fi
-          
-          echo "✅ Downloading Paper from: $PAPERMC_URL"
-          wget -O server/paper.jar "$PAPERMC_URL"
+          BUILD=$(curl -s $PROJECT_URL/versions/$VERSION | jq '.builds[-1]')
+          wget -O server/paper.jar "$PROJECT_URL/versions/$VERSION/builds/$BUILD/downloads/paper-$VERSION-$BUILD.jar"
           
           cp -r plugins/* server/plugins/
 
       # 6. Configure Plugins (DiscordSRV & Bedrock Nether)
-      - name: 🔧 Configure Plugins
+      - name: ðŸ”§ Configure Plugins
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         run: |
@@ -254,7 +219,7 @@ jobs:
           fi
 
       # 7. Start Server & Tunnel (Combined to prevent GitHub killing background processes)
-      - name: 🟢 Start Server
+      - name: ðŸŸ¢ Start Server
         env:
           PLAYIT_SECRET: ${{ secrets.PLAYIT_SECRET }}
         run: |
@@ -263,7 +228,7 @@ jobs:
           if [ -z "$PLAYIT_SECRET" ]; then
             echo ""
             echo "================================================================="
-            echo "❌ ERROR: NO PLAYIT_SECRET FOUND!"
+            echo "âŒ ERROR: NO PLAYIT_SECRET FOUND!"
             echo "================================================================="
             echo "1. Go to https://playit.gg and create an account"
             echo "2. Download and run the Playit agent on your own computer first to claim it"
@@ -284,18 +249,18 @@ jobs:
           
           # 2. Show Connection Info
           echo "------------------------------------------"
-          echo "🚀 YOUR MINECRAFT SERVER IS ONLINE!"
+          echo "ðŸš€ YOUR MINECRAFT SERVER IS ONLINE!"
           echo "------------------------------------------"
           JAVA_IP=$(grep -oE '[a-zA-Z0-9.-]+\.joinmc\.link' playit_log.txt | head -n 1)
-          echo "🖥️ JAVA IP: ${JAVA_IP:-Check playit.gg dashboard}"
+          echo "ðŸ–¥ï¸ JAVA IP: ${JAVA_IP:-Check playit.gg dashboard}"
           BEDROCK_INFO=$(grep -oE '[a-zA-Z0-9.-]+\.ply\.gg:[0-9]+' playit_log.txt | head -n 1)
           if [ -z "$JAVA_IP" ] && [ -z "$PLAYIT_SECRET" ]; then
-             echo "⚠️ SERVER HAS NO IP! YOU MUST CLICK THE CLAIM LINK ABOVE ⚠️"
+             echo "âš ï¸ SERVER HAS NO IP! YOU MUST CLICK THE CLAIM LINK ABOVE âš ï¸"
           else
-             echo "📱 BEDROCK: ${BEDROCK_INFO:-Check playit.gg dashboard}"
+             echo "ðŸ“± BEDROCK: ${BEDROCK_INFO:-Check playit.gg dashboard}"
           fi
           echo "------------------------------------------"
-          echo "🎮 Logs below are only from Minecraft..."
+          echo "ðŸŽ® Logs below are only from Minecraft..."
           
           cd server
           
@@ -312,7 +277,7 @@ jobs:
           WARNED_1="false"
           WARNED_COUNTDOWN="false"
           
-          echo "⏳ Server started. Monitoring for 5.5 hours or manual stop..."
+          echo "â³ Server started. Monitoring for 5.5 hours or manual stop..."
           
           while kill -0 $SERVER_PID 2>/dev/null; do
             CURRENT_TIME=$(date +%s)
@@ -320,30 +285,30 @@ jobs:
             
             # --- WARNING 1: 30 Minutes Left (at 18000s) ---
             if [ $ELAPSED -ge 18000 ] && [ "$WARNED_30" == "false" ]; then
-                echo "say ⚠️ NOTICE: Server will shutdown in 30 minutes!" > /proc/$SERVER_PID/fd/0
+                echo "say âš ï¸ NOTICE: Server will shutdown in 30 minutes!" > /proc/$SERVER_PID/fd/0
                 WARNED_30="true"
             fi
 
             # --- WARNING 2: 1 Minute Left (at 19740s) ---
             if [ $ELAPSED -ge 19740 ] && [ "$WARNED_1" == "false" ]; then
-                echo "say 🚨 URGENT: Server will shutdown in 1 MINUTE!" > /proc/$SERVER_PID/fd/0
+                echo "say ðŸš¨ URGENT: Server will shutdown in 1 MINUTE!" > /proc/$SERVER_PID/fd/0
                 WARNED_1="true"
             fi
 
             # --- WARNING 3: 15s Countdown (at 19785s) ---
             if [ $ELAPSED -ge 19785 ] && [ "$WARNED_COUNTDOWN" == "false" ]; then
                 WARNED_COUNTDOWN="true"
-                echo "say 🚨 Countdown started..." > /proc/$SERVER_PID/fd/0
+                echo "say ðŸš¨ Countdown started..." > /proc/$SERVER_PID/fd/0
                 for i in {15..1}; do
                    echo "say Server shutting down in $i..." > /proc/$SERVER_PID/fd/0
                    sleep 1
                 done
-                echo "say 👋 Server is closing now!" > /proc/$SERVER_PID/fd/0
+                echo "say ðŸ‘‹ Server is closing now!" > /proc/$SERVER_PID/fd/0
             fi
 
             # If timer runs out (5.5 hours)
             if [ $ELAPSED -ge $MAX_DURATION ]; then
-              echo "⏰ Time limit reached (5.5h). Initiating shutdown..."
+              echo "â° Time limit reached (5.5h). Initiating shutdown..."
               
               # Try Graceful Stop
               echo "stop" > /proc/$SERVER_PID/fd/0
@@ -358,7 +323,7 @@ jobs:
               
               # If still running after 60s, FORCE KILL
               if kill -0 $SERVER_PID 2>/dev/null; then
-                 echo "⚠️ Server stuck! Force killing to ensure backup..."
+                 echo "âš ï¸ Server stuck! Force killing to ensure backup..."
                  kill -9 $SERVER_PID
               fi
               break
@@ -367,7 +332,7 @@ jobs:
             PLAYIT_CHECK=$((ELAPSED % 60))
             if [ "$PLAYIT_CHECK" -lt 11 ]; then
               if ! kill -0 $PLAYIT_PID 2>/dev/null; then
-                echo "⚠️ Playit tunnel crashed! Here is the error log:"
+                echo "âš ï¸ Playit tunnel crashed! Here is the error log:"
                 cat $GITHUB_WORKSPACE/playit_log.txt || echo "No log found."
                 echo "Restarting Playit..."
                 if [ -z "$PLAYIT_SECRET" ]; then
@@ -385,10 +350,10 @@ jobs:
           
           # 3. Final Cleanup
           wait $SERVER_PID || true
-          echo "✅ Server process finished. Proceeding to backup..."
+          echo "âœ… Server process finished. Proceeding to backup..."
 
       # 8. Auto-Backup (Includes worlds, player data, and all plugin data like Ultimate Teams .yml files)
-      - name: 📤 Backup to Google Drive
+      - name: ðŸ“¤ Backup to Google Drive
         if: always()
         run: |
           cd server
@@ -396,17 +361,17 @@ jobs:
           # The 'plugins' folder is zipped recursively, safely backing up all plugin configs, .yml files, and databases!
           zip -r backup.zip minecraft-worlds plugins *.json *.yml -x "*.jar"
           rclone copy backup.zip gdrive:MinecraftServer/
-          echo "✅ Backup Complete!"
+          echo "âœ… Backup Complete!"
 
       # 9. Auto-Restart Workflow
-      - name: 🔄 Auto-Restart Server
+      - name: ðŸ”„ Auto-Restart Server
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Triggering next workflow run to restart the server..."
           gh workflow run main.yml --ref ${{ github.ref_name }}
-          echo "✅ Restart triggered successfully! Thanks for using @GamingBurst007's script!"
+          echo "âœ… Restart triggered successfully! Thanks for using @GamingBurst007's script!"
 
 # --- End of Workflow ---
 # Developed by @GamingBurst007 (Discord/Insta)

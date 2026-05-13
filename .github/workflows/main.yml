@@ -211,11 +211,25 @@ jobs:
 
           if ls server/plugins/Geyser-Spigot*.jar 1> /dev/null 2>&1; then
             mkdir -p server/plugins/Geyser-Spigot
-            echo "above-bedrock-nether-building: true" > server/plugins/Geyser-Spigot/config.yml
-            echo "max-build-height: 256" >> server/plugins/Geyser-Spigot/config.yml
-            echo "cache-chunks: true" >> server/plugins/Geyser-Spigot/config.yml
-            echo "forward-player-ping: true" >> server/plugins/Geyser-Spigot/config.yml
-            echo "force-resource-packs: true" >> server/plugins/Geyser-Spigot/config.yml
+            cat > server/plugins/Geyser-Spigot/config.yml << 'EOF'
+bedrock:
+  port: 19132
+  clone-remote-port: false
+  motd1: "VoidBerry SMP"
+  motd2: "Bedrock Connect"
+  server-name: "VoidBerry SMP"
+remote:
+  address: auto
+  port: 25565
+  auth-type: offline
+above-bedrock-nether-building: true
+max-build-height: 256
+cache-chunks: true
+forward-player-ping: true
+force-resource-packs: true
+passthrough-motd: true
+passthrough-player-counts: true
+EOF
           fi
 
           if [ -d server/plugins/UltimateTeams ]; then

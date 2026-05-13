@@ -212,7 +212,6 @@ jobs:
           if ls server/plugins/Geyser-Spigot*.jar 1> /dev/null 2>&1; then
             mkdir -p server/plugins/Geyser-Spigot
             # --- GEYSER CONFIG: Fixed for Proxy Protocol + Bedrock "End of Stream" ---
-            # enable-proxy-protocol inside bedrock section for newer Geyser compatibility
             # auth-type: offline matches server online-mode=false
             echo "bedrock:" > server/plugins/Geyser-Spigot/config.yml
             echo "  port: 19132" >> server/plugins/Geyser-Spigot/config.yml
@@ -220,7 +219,6 @@ jobs:
             echo "  motd1: \"VoidBerry SMP\"" >> server/plugins/Geyser-Spigot/config.yml
             echo "  motd2: \"Bedrock Connect\"" >> server/plugins/Geyser-Spigot/config.yml
             echo "  server-name: \"VoidBerry SMP\"" >> server/plugins/Geyser-Spigot/config.yml
-            echo "  enable-proxy-protocol: true" >> server/plugins/Geyser-Spigot/config.yml
             echo "remote:" >> server/plugins/Geyser-Spigot/config.yml
             echo "  address: auto" >> server/plugins/Geyser-Spigot/config.yml
             echo "  port: 25565" >> server/plugins/Geyser-Spigot/config.yml

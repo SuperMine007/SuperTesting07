@@ -123,7 +123,7 @@ jobs:
           echo "unsupported-settings:" >> server/config/paper-global.yml
           echo "  allow-piston-duplication: true" >> server/config/paper-global.yml
           
-          # --- ENABLE PROXY PROTOCOL FOR REAL IPs ---
+          # --- ENABLE PROXY PROTOCOL FOR REAL IPs (Java players via Playit) ---
           echo "proxies:" >> server/config/paper-global.yml
           echo "  proxy-protocol: true" >> server/config/paper-global.yml
 
@@ -211,6 +211,9 @@ jobs:
 
           if ls server/plugins/Geyser-Spigot*.jar 1> /dev/null 2>&1; then
             mkdir -p server/plugins/Geyser-Spigot
+            # --- GEYSER CONFIG: Fixed for Proxy Protocol + Bedrock "End of Stream" ---
+            # enable-proxy-protocol: true tells Geyser to also send Proxy Protocol headers
+            # so Paper correctly accepts Bedrock players when proxy-protocol: true is set
             cat > server/plugins/Geyser-Spigot/config.yml << 'EOF'
 bedrock:
   port: 19132
@@ -222,6 +225,7 @@ remote:
   address: auto
   port: 25565
   auth-type: offline
+enable-proxy-protocol: true
 above-bedrock-nether-building: true
 max-build-height: 256
 cache-chunks: true

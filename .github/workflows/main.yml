@@ -212,28 +212,26 @@ jobs:
           if ls server/plugins/Geyser-Spigot*.jar 1> /dev/null 2>&1; then
             mkdir -p server/plugins/Geyser-Spigot
             # --- GEYSER CONFIG: Fixed for Proxy Protocol + Bedrock "End of Stream" ---
-            # enable-proxy-protocol: true tells Geyser to also send Proxy Protocol headers
-            # so Paper correctly accepts Bedrock players when proxy-protocol: true is set
-            cat > server/plugins/Geyser-Spigot/config.yml << 'EOF'
-bedrock:
-  port: 19132
-  clone-remote-port: false
-  motd1: "VoidBerry SMP"
-  motd2: "Bedrock Connect"
-  server-name: "VoidBerry SMP"
-remote:
-  address: auto
-  port: 25565
-  auth-type: offline
-enable-proxy-protocol: true
-above-bedrock-nether-building: true
-max-build-height: 256
-cache-chunks: true
-forward-player-ping: true
-force-resource-packs: true
-passthrough-motd: true
-passthrough-player-counts: true
-EOF
+            # enable-proxy-protocol inside bedrock section for newer Geyser compatibility
+            # auth-type: offline matches server online-mode=false
+            echo "bedrock:" > server/plugins/Geyser-Spigot/config.yml
+            echo "  port: 19132" >> server/plugins/Geyser-Spigot/config.yml
+            echo "  clone-remote-port: false" >> server/plugins/Geyser-Spigot/config.yml
+            echo "  motd1: \"VoidBerry SMP\"" >> server/plugins/Geyser-Spigot/config.yml
+            echo "  motd2: \"Bedrock Connect\"" >> server/plugins/Geyser-Spigot/config.yml
+            echo "  server-name: \"VoidBerry SMP\"" >> server/plugins/Geyser-Spigot/config.yml
+            echo "  enable-proxy-protocol: true" >> server/plugins/Geyser-Spigot/config.yml
+            echo "remote:" >> server/plugins/Geyser-Spigot/config.yml
+            echo "  address: auto" >> server/plugins/Geyser-Spigot/config.yml
+            echo "  port: 25565" >> server/plugins/Geyser-Spigot/config.yml
+            echo "  auth-type: offline" >> server/plugins/Geyser-Spigot/config.yml
+            echo "above-bedrock-nether-building: true" >> server/plugins/Geyser-Spigot/config.yml
+            echo "max-build-height: 256" >> server/plugins/Geyser-Spigot/config.yml
+            echo "cache-chunks: true" >> server/plugins/Geyser-Spigot/config.yml
+            echo "forward-player-ping: true" >> server/plugins/Geyser-Spigot/config.yml
+            echo "force-resource-packs: true" >> server/plugins/Geyser-Spigot/config.yml
+            echo "passthrough-motd: true" >> server/plugins/Geyser-Spigot/config.yml
+            echo "passthrough-player-counts: true" >> server/plugins/Geyser-Spigot/config.yml
           fi
 
           if [ -d server/plugins/UltimateTeams ]; then

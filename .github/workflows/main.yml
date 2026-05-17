@@ -174,19 +174,23 @@ jobs:
       # 5. Download Core & Plugins (Smart Version Check)
       - name: Download Paper (Smart Version Check) & Plugins
         run: |
-          TARGET_VERSION="1.26.2"
-          PROJECT_URL="https://api.papermc.io/v2/projects/paper"
+          TARGET_VERSION="26.1.2"
           
-          if curl -s $PROJECT_URL | jq -e ".versions | index(\"$TARGET_VERSION\")" > /dev/null; then
-            VERSION="$TARGET_VERSION"
-            echo "✅ Targeting version $VERSION"
+          if [ "$TARGET_VERSION" == "26.1.2" ]; then
+            echo "✅ Targeting Paper 26.1.2 (Direct Download)"
+            wget -O server/paper.jar "https://fill-data.papermc.io/v1/objects/830d4eb5c15cbd802a9ec9f2f54eaaaeb9511958339aec983fd0c88bad21d940/paper-26.1.2-64.jar"
           else
-            VERSION=$(curl -s $PROJECT_URL | jq -r '.versions[-1]')
-            echo "⚠️ Version $TARGET_VERSION not found. Falling back to latest: $VERSION"
+            PROJECT_URL="https://api.papermc.io/v2/projects/paper"
+            if curl -s $PROJECT_URL | jq -e ".versions | index(\"$TARGET_VERSION\")" > /dev/null; then
+              VERSION="$TARGET_VERSION"
+              echo "✅ Targeting version $VERSION"
+            else
+              VERSION=$(curl -s $PROJECT_URL | jq -r '.versions[-1]')
+              echo "⚠️ Version $TARGET_VERSION not found. Falling back to latest: $VERSION"
+            fi
+            BUILD=$(curl -s $PROJECT_URL/versions/$VERSION | jq '.builds[-1]')
+            wget -O server/paper.jar "$PROJECT_URL/versions/$VERSION/builds/$BUILD/downloads/paper-$VERSION-$BUILD.jar"
           fi
-          
-          BUILD=$(curl -s $PROJECT_URL/versions/$VERSION | jq '.builds[-1]')
-          wget -O server/paper.jar "$PROJECT_URL/versions/$VERSION/builds/$BUILD/downloads/paper-$VERSION-$BUILD.jar"
           
           cp -r plugins/* server/plugins/
 

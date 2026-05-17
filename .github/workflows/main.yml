@@ -174,7 +174,7 @@ jobs:
       # 5. Download Core & Plugins (Smart Version Check)
       - name: Download Paper (Smart Version Check) & Plugins
         run: |
-          TARGET_VERSION="1.21.11"
+          TARGET_VERSION="1.26.2"
           PROJECT_URL="https://api.papermc.io/v2/projects/paper"
           
           if curl -s $PROJECT_URL | jq -e ".versions | index(\"$TARGET_VERSION\")" > /dev/null; then
